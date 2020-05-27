@@ -52,7 +52,7 @@ arcpy.CopyFeatures_management(wetland_complex_input, wet_comp)
 arcpy.MakeFeatureLayer_management(wet_comp,"wet_lyr")
 lyr_wet = arcpy.mapping.Layer("wet_lyr")
 
-#Buffer the Wetland Complexs to different needs
+'''Buffer the Wetland Complexs to different needs'''
 
 #Output
 wetbuff_100m = work_gdb + r"\Wetland_Complex_100m_buff_" + time 
@@ -78,6 +78,7 @@ arcpy.FeatureToPoint_management(lyr_wet, wet_centroid, "INSIDE")
 #Buffer Centroids Outputs
 cent_buff_10m = work_gdb + r"\Wetland_Complex_Centroid_10m_buff_" + time 
 cent_buff_25m = work_gdb + r"\Wetland_Complex_Centroid_25m_buff_" + time 
+cent_buff_50m = work_gdb + r"\Wetland_Complex_Centroid_5m_buff_" + time
 cent_buff_100m = work_gdb + r"\Wetland_Complex_Centroid_100m_buff_" + time
 cent_buff_500m = work_gdb + r"\Wetland_Complex_Centroid_500m_buff_" + time
 
@@ -86,6 +87,8 @@ arcpy.Buffer_analysis(wet_centroid, cent_buff_10m, "10 Meters")
 arcpy.Buffer_analysis(wet_centroid, cent_buff_25m, "25 Meters")
 arcpy.Buffer_analysis(wet_centroid, cent_buff_100m, "100 Meters")
 arcpy.Buffer_analysis(wet_centroid, cent_buff_500m, "500 Meters")
+
+''' End of Buffering '''
 
 '''OF1 - Process to Calculate Distance to Human Settlement'''
 #Human Settlement Feature
@@ -273,86 +276,88 @@ lyr_lakes = arcpy.mapping.Layer("lakes_layer")
 lyr_lakes.definitionQuery = areaFieldName "> 80000"
 
 #First add the field (Settlement w/i) to the copied Wetland Complex
-hmn_field = "OF4_Lakes_Dist"
-arcpy.AddField_management(wet_comp, hmn_field, "DOUBLE")
+lakes_field = "OF4_Lakes_Dist"
+arcpy.AddField_management(wet_comp, lakes_field, "DOUBLE")
 
 #Create the spatial join outputs
-hmn_join_100m = work_gdb + r"\Wet_HmnWet_100m_buff_" + time 
-hmn_join_500m = work_gdb + r"\Wet_HmnWet_500m_buff_" + time 
-hmn_join_1km = work_gdb + r"\Wet_HmnWet_1km_buff_" + time 
-hmn_join_2km = work_gdb + r"\Wet_HmnWet_2km_buff_" + time 
-hmn_join_5km = work_gdb + r"\Wet_HmnWet_5km_buff_" + time 
-hmn_join_10km = work_gdb + r"\Wet_HmnWet_10km_buff_" + time 
+lakes_join_100m = work_gdb + r"\Wet_lakes_100m_buff_" + time 
+lakes_join_500m = work_gdb + r"\Wet_lakes_500m_buff_" + time 
+lakes_join_1km = work_gdb + r"\Wet_lakes_1km_buff_" + time 
+lakes_join_2km = work_gdb + r"\Wet_lakes_2km_buff_" + time 
+lakes_join_5km = work_gdb + r"\Wet_lakes_5km_buff_" + time 
+lakes_join_10km = work_gdb + r"\Wet_lakes_10km_buff_" + time 
 
 #At 10km
 
 #Spatial Join
-arcpy.SpatialJoin(wetbuff_10km, lyr_hmn, hmn_join_10km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+arcpy.SpatialJoin(wetbuff_10km, lyr_lakes, lakes_join_10km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 10km Buffer
-overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_10km, wet_ID)]
+overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_10km, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "10000")
+arcpy.CalculateField_management (lyr_wet, lakes_field, "10000")
 
 
 #At 5km
 
 #Spatial Join
-arcpy.SpatialJoin(wetbuff_5km, lyr_hmn, hmn_join_5km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+arcpy.SpatialJoin(wetbuff_5km, lyr_lakes, lakes_join_5km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 5km Buffer
-overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_5km, wet_ID)]
+overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_10km, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "5000")
+arcpy.CalculateField_management (lyr_wet, lakes_field, "5000")
 
 #At 2km
 
 #Spatial Join
-arcpy.SpatialJoin(wetbuff_2km, lyr_hmn, hmn_join_2km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+arcpy.SpatialJoin(wetbuff_2km, lyr_lakes, lakes_join_2km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 2km Buffer
-overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_2km, wet_ID)]
+overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_10km, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "2000")
+arcpy.CalculateField_management (lyr_wet, lakes_field, "2000")
 
 #At 1km
 
 #Spatial Join
-arcpy.SpatialJoin(wetbuff_1km, lyr_hmn, hmn_join_1km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+arcpy.SpatialJoin(wetbuff_1km, lyr_lakes, lakes_join_1km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 1km Buffer
-overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_1km, wet_ID)]
+overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_1km, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "1000")
+arcpy.CalculateField_management (lyr_wet, lakes_field, "1000")
 
 #At 500m
 
 #Spatial Join
-arcpy.SpatialJoin(wetbuff_500m, lyr_hmn, hmn_join_500m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+arcpy.SpatialJoin(wetbuff_500m, lyr_lakes, lakes_join_500m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 100m Buffer
-overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_500m, wet_ID)]
+overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_500m, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "500")
+arcpy.CalculateField_management (lyr_wet, lakes_field, "500")
 
 #At 100m
 
 #Spatial Join
-arcpy.SpatialJoin(wetbuff_100m, lyr_hmn, hmn_join_100m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+arcpy.SpatialJoin(wetbuff_100m, lyr_hmn, lakes_join_100m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 100m Buffer
-overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_100m, wet_ID)]
+overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_100m, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "100")
+arcpy.CalculateField_management (lyr_wet, lakes_field, "100")
 
 
+''' End of OF4 '''
 
+''' OF5 Relative Elevation in Watershed '''
 
 
 
