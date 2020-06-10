@@ -570,7 +570,7 @@ with arcpy.da.UpdateCursor(lyr_wet, [field_name, areabuffer_field, areaLakes_fie
 		cursor.updateRow(test)
 
 #Calculate Amount Lakes Percent
-calc_lakesPerc = r"(!areaLakes_field!/!areabuffer_field!)*100"
+calc_lakesPerc = r"(!Arealakes_wi2km!/!TotalArea_wi2km!)*100"
 arcpy.CalculateField_management(lyr_wet, percentLakes_field, calc_lakesPerc)
 
 
@@ -611,18 +611,27 @@ with arcpy.da.UpdateCursor(lyr_wet, [field_name, areabuffer_field, areaWater_fie
 
 		#put a definition query on the lyr_wet and 2km Buffer
 		lyr_water2km.definitionQuery = field_name + " = " + test[0]
-		lyr_Buffwet2km.definitionQuery = field_name + " = " + test[0]
+		lyr_wet.definitionQuery = field_name + " = " + test[0]
+		
+		#get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
+		desc = arcpy.Describe(lyr_water2km)
+		geomField = desc.shapeFieldName
+		Buff_water2km_areaFieldName = str(geomField) + "_Area"
+		
+		#iterate through layer with Bu		
+		cursor2 = arcpy.SearchCursor(lyr_water2km) 
+		for test2 in cursor2:
+		#Iterate through the total area of Wetlands and Lakes
+			numerator = test2.getValue(Buff_water2km_areaFieldName) + numerator
+		
 
-		#calculate the total area of Wetlands
-		numerator = arcpy.CalculateGeometryAttributes_management(lyr_wet2km, "AREA")
-
-		#Calculate Fields
-
-		#populate - Amount of Wetland and Lake within 2km
-		arcpy.CalculateField_management(lyr_wet, areaWater_field, numerator)
+		#Populate Fields
+		test[2] = numerator
+		cursor.updateRow(test)
+		
 
 #Calculate Amount Lakes Percent
-calc_lakesPerc = r"(areaWater_field/areabuffer_field)*100"
+calc_lakesPerc = r"(!AreaWetlakes_wi2km!/!TotalArea_wi2km!)*100"
 arcpy.CalculateField_management(lyr_wet, percentWater_field, calc_lakesPerc)
 
 ''' End OF22 '''
@@ -651,11 +660,16 @@ arcpy.SpatialJoin_analysis(wet_centroid, vri, site_Index, "JOIN_ONE_TO_MANY", "K
 with arcpy.da.UpdateCursor(site_Index, [wet_ID, "SITE_INDEX"]) as cursor:
 	for test in cursor:
 		#Definition Query for Wetlands
-		lyr_wet.definitionQuery = wet_ID + " = " + row[0]
-
-		#Apply Site Series
-		arcpy.CalculateField_management(lyr_wet, siteIndex_field, row[1])
-
+		lyr_wet.definitionQuery = wet_ID + " = " + test[0]
+		
+		
+		#iterate through layer with Bu		
+		
+		cursor2 = arcpy.UpdateCursor(lyr_wet) 
+		for test2 in cursor2:
+		#Iterate through the total area of Wetlands and Lakes
+			test2.setValue(siteIndex_field, test[1])
+		
 lyr_wet.definitionQuery = ""
 
 ''' End OF32 '''
@@ -729,8 +743,6 @@ BCLCS_rare_defquer = [row[0] for row in arcpy.da.SearchCursor(lyr_freq_BCLCS, BC
 #Query the BCLCS layer to only have rare layers
 lyr_BCLCS.definitionQuery = BCLCS_con + " = " + BCLCS_rare_defquer
 
-#remove def quer
-
 
 #At 5km
 
@@ -793,13 +805,16 @@ lyr_union_BCLCS = arcpy.mapping.Layer("union_BCLCS_lyr")
 
 
 #iterate through Wet Comp ID
-with arcpy.da.UpdateCursor(site_Index, [wet_ID, numClass_field]) as cursor:
+with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
-		lyr_union_BCLCS.definitionQuery = wet_ID + ' = ' + row[0]
-
+		lyr_union_BCLCS.definitionQuery = wet_ID + ' = ' + test[0]
+			
 		#getcount of BCLCS type
 		num_classes = arcpy.GetCount_management(lyr_union_BCLCS)
-		arcpy.CalculateField_management(wet_comp, numClass_field, num_classes)
+		
+		test[1] = num_classes
+		cursor.updateRow(test)
+		
 
 lyr_union_BCLCS.definitionQuery = ""
 
@@ -823,13 +838,15 @@ lyr_union_BCLCS_2km = arcpy.mapping.Layer("union_BCLCS_2km_lyr")
 
 
 #iterate through Wet Comp ID
-with arcpy.da.UpdateCursor(site_Index, [wet_ID, numClass_field]) as cursor:
+with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
-		lyr_union_BCLCS_2km.definitionQuery = wet_ID + ' = ' + row[0]
+		lyr_union_BCLCS_2km.definitionQuery = wet_ID + ' = ' + test[0]
 
 		#getcount of BCLCS type
 		num_classes = arcpy.GetCount_management(lyr_union_BCLCS_2km)
-		arcpy.CalculateField_management(wet_comp, numClass_field, num_classes)
+		
+		test[1] = num_classes
+		cursor.updateRow(test)
 
 lyr_union_BCLCS_2km.definitionQuery = ""
 
@@ -859,17 +876,17 @@ geomField = desc.shapeFieldName
 decid_BCLCS_areaFieldName = str(geomField) + "_Area"
 
 #iterate through Wet Comp ID
-with arcpy.da.UpdateCursor(area_decid_wi100m, [wet_ID]) as cursor:
+with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
-		lyr_decid_BCLCS.definitionQuery = wet_ID + ' = ' + row[0]
-
+		lyr_decid_BCLCS.definitionQuery = wet_ID + ' = ' + test[0]
+		
+		cursor2 = arcpy.SearchCursor(lyr_decid_BCLCS) 
 		#calculate the total area of Decid w/i 100m
-		decid_area = arcpy.CalculateGeometryAttributes_management(lyr_decid_BCLCS, "AREA")
-
-		#Calculate Fields
-
-		#populate - Amount of Wetland and Lake within 2km
-		arcpy.CalculateField_management(wet_comp, numClass_field, decid_area)
+		for test2 in cursor2:
+			decid_area = test2.getValue(decid_BCLCS_areaFieldName) + decid_area
+		
+		test[1] = decid_area
+		cursor.updateRow(test)
 
 lyr_BCLCS.definitionQuery = r""
 
@@ -899,18 +916,21 @@ geomField = desc.shapeFieldName
 conif_BCLCS_areaFieldName = str(geomField) + "_Area"
 
 #iterate through Wet Comp ID
-with arcpy.da.UpdateCursor(area_conifer_wi100m, [wet_ID]) as cursor:
+with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
-		lyr_conif_BCLCS.definitionQuery = wet_ID + ' = ' + row[0]
+		lyr_conif_BCLCS.definitionQuery = wet_ID + ' = ' + test[0]
 
 		#calculate the total area of Decid w/i 100m
 		conif_area = arcpy.CalculateGeometryAttributes_management(lyr_conif_BCLCS, "AREA")
 
-		#Calculate Fields
-
-		#populate - Amount of Wetland and Lake within 2km
-		arcpy.CalculateField_management(wet_comp, numClass_field, conif_area)
-
+		cursor2 = arcpy.SearchCursor(lyr_conif_BCLCS) 
+		#calculate the total area of Decid w/i 100m
+		for test2 in cursor2:
+			conif_area = test2.getValue(conif_BCLCS_areaFieldName) + conif_area
+		
+		test[1] = conif_area
+		cursor.updateRow(test)
+		
 lyr_BCLCS.definitionQuery = r""
 
 ''' End OF44 '''
@@ -935,21 +955,21 @@ lyr_mixed_BCLCS = arcpy.mapping.Layer("conif_BCLCS_lyr")
 #get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
 desc = arcpy.Describe(lyr_mixed_BCLCS)
 geomField = desc.shapeFieldName
-conif_BCLCS_areaFieldName = str(geomField) + "_Area"
+mixed_BCLCS_areaFieldName = str(geomField) + "_Area"
 
 #iterate through Wet Comp ID
-with arcpy.da.UpdateCursor(area_mixed_wi100m, [wet_ID]) as cursor:
+with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
-		lyr_mixed_BCLCS.definitionQuery = wet_ID + ' = ' + row[0]
+		
+		lyr_mixed_BCLCS.definitionQuery = wet_ID + ' = ' + test[0]
 
+		cursor2 = arcpy.SearchCursor(lyr_mixed_BCLCS) 
 		#calculate the total area of Decid w/i 100m
-		mixed_area = arcpy.CalculateGeometryAttributes_management(lyr_mixed_BCLCS, "AREA")
-
-		#Calculate Fields
-
-		#populate - Amount of Wetland and Lake within 2km
-		arcpy.CalculateField_management(wet_comp, numClass_field, mixed_area)
-
+		for test2 in cursor2:
+			mixed_area = test2.getValue(mixed_BCLCS_areaFieldName) + mixed_area
+		
+		test[1] = mixed_area
+		cursor.updateRow(test)
 lyr_BCLCS.definitionQuery = r""
 
 
@@ -976,20 +996,21 @@ lyr_nonTreed_BCLCS = arcpy.mapping.Layer("nonTreed_BCLCS_lyr")
 #get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
 desc = arcpy.Describe(lyr_nonTreed_BCLCS)
 geomField = desc.shapeFieldName
-conif_BCLCS_areaFieldName = str(geomField) + "_Area"
+nonTreed_BCLCS_areaFieldName = str(geomField) + "_Area"
 
 #iterate through Wet Comp ID
-with arcpy.da.UpdateCursor(area_NonTree_wi100m, [wet_ID]) as cursor:
+with arcpy.da.UpdateCursor(wet_comp, [wet_ID,numClass_field]) as cursor:
 	for test in cursor:
 		lyr_nonTreed_BCLCS.definitionQuery = wet_ID + ' = ' + row[0]
-
+		
+		cursor2 = arcpy.SearchCursor(lyr_nonTreed_BCLCS) 
 		#calculate the total area of Decid w/i 100m
-		conif_area = arcpy.CalculateGeometryAttributes_management(lyr_nonTreed_BCLCS, "AREA")
-
-		#Calculate Fields
-
-		#populate - Amount of Wetland and Lake within 2km
-		arcpy.CalculateField_management(wet_comp, numClass_field, conif_area)
+		for test2 in cursor2:
+			non_area = test2.getValue(nonTreed_BCLCS_areaFieldName) + non_area
+		
+		test[1] = non_area
+		cursor.updateRow(test)
+		
 
 lyr_BCLCS.definitionQuery = r""
 
