@@ -109,7 +109,7 @@ arcpy.Buffer_analysis(wet_centroid, cent_buff_500m, "500 Meters")
 #Human Settlement Feature
 
 ''' Make Changes Here To Human Settlement Feature - HARD CODE'''
-HMN_Settle = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\Data\ExtendedSSAF_HmnDensityAreas_WUI_5kmBuffer_190717"
+HMN_Settle = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\Data\ExtendedSSAF_fwaAU_Hmn_Structure_Density_191001"
 
 #Human Settlement Query Layer
 arcpy.MakeFeatureLayer_management(HMN_Settle,"hmn_lyr")
@@ -408,7 +408,7 @@ elev_CE= "RelativeElev"
 arcpy.AddField_management(wet_relief, elev_CE, "DOUBLE")
 
 #Calculate the value
-value = r"(!RASTERVALU! - !MinElev!) / !Elev_Relief!)"
+value = r"(!RASTERVALU! - !MinElev!) / !Elev_Relief!"
 
 #Populate the field in SJ 
 arcpy.CalculateField_management(wet_relief, elev_CE, value)
