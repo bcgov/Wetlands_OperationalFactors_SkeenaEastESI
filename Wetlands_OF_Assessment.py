@@ -530,14 +530,14 @@ arcpy.Clip_analysis(wetbuff_2km, lyr_lakes, area_lakes_wi2km)
 arcpy.MakeFeatureLayer_management(area_lakes_wi2km,"wet2km_lyr")
 lyr_wet2km = arcpy.mapping.Layer("wet2km_lyr")
 
-#Set up variable
-denominator = 0
-numerator = 0
 
-iterate through wetlands 
+
+#iterate through wetlands 
 with arcpy.da.UpdateCursor(lyr_wet, [field_name, areabuffer_field, areaLakes_field]) as cursor:
 	for test in cursor:
-
+		#Set up variable
+		denominator = 0
+		numerator = 0
 		#put a definition query on the lyr_wet and 2km Buffer
 		lyr_wet2km.definitionQuery = field_name + " = " + test[0]
 		lyr_Buffwet2km.definitionQuery = field_name + " = " + test[0]
@@ -608,7 +608,9 @@ lyr_water2km = arcpy.mapping.Layer("water2km_lyr")
 
 with arcpy.da.UpdateCursor(lyr_wet, [field_name, areabuffer_field, areaWater_field]) as cursor:
 	for test in cursor:
-
+		#Set up variable
+		denominator = 0
+		numerator = 0
 		#put a definition query on the lyr_wet and 2km Buffer
 		lyr_water2km.definitionQuery = field_name + " = " + test[0]
 		lyr_wet.definitionQuery = field_name + " = " + test[0]
@@ -878,6 +880,8 @@ decid_BCLCS_areaFieldName = str(geomField) + "_Area"
 #iterate through Wet Comp ID
 with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
+		decid_area = 0
+		
 		lyr_decid_BCLCS.definitionQuery = wet_ID + ' = ' + test[0]
 		
 		cursor2 = arcpy.SearchCursor(lyr_decid_BCLCS) 
@@ -918,10 +922,10 @@ conif_BCLCS_areaFieldName = str(geomField) + "_Area"
 #iterate through Wet Comp ID
 with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
+		conif_area = 0
+		
 		lyr_conif_BCLCS.definitionQuery = wet_ID + ' = ' + test[0]
 
-		#calculate the total area of Decid w/i 100m
-		conif_area = arcpy.CalculateGeometryAttributes_management(lyr_conif_BCLCS, "AREA")
 
 		cursor2 = arcpy.SearchCursor(lyr_conif_BCLCS) 
 		#calculate the total area of Decid w/i 100m
@@ -960,7 +964,7 @@ mixed_BCLCS_areaFieldName = str(geomField) + "_Area"
 #iterate through Wet Comp ID
 with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
-		
+		mixed_area = 0
 		lyr_mixed_BCLCS.definitionQuery = wet_ID + ' = ' + test[0]
 
 		cursor2 = arcpy.SearchCursor(lyr_mixed_BCLCS) 
@@ -1001,6 +1005,7 @@ nonTreed_BCLCS_areaFieldName = str(geomField) + "_Area"
 #iterate through Wet Comp ID
 with arcpy.da.UpdateCursor(wet_comp, [wet_ID,numClass_field]) as cursor:
 	for test in cursor:
+		non_area = 0
 		lyr_nonTreed_BCLCS.definitionQuery = wet_ID + ' = ' + row[0]
 		
 		cursor2 = arcpy.SearchCursor(lyr_nonTreed_BCLCS) 
