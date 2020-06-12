@@ -411,7 +411,7 @@ arcpy.AddField_management(wet_relief, elev_CE, "DOUBLE")
 value = r"(!RASTERVALU! - !MinElev!) / !Elev_Relief!"
 
 #Populate the field in SJ 
-arcpy.CalculateField_management(wet_relief, elev_CE, value)
+arcpy.CalculateField_management(wet_relief, elev_CE, value, "PYTHON")
 
 #create layer to definition query
 arcpy.MakeFeatureLayer_management(wet_relief,"relief_lyr")
@@ -533,15 +533,15 @@ lyr_wet2km = arcpy.mapping.Layer("wet2km_lyr")
 
 
 #iterate through wetlands 
-with arcpy.da.UpdateCursor(lyr_wet, [field_name, areabuffer_field, areaLakes_field]) as cursor:
+with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, areabuffer_field, areaLakes_field]) as cursor:
 	for test in cursor:
 		#Set up variable
 		denominator = 0
 		numerator = 0
 		#put a definition query on the lyr_wet and 2km Buffer
-		lyr_wet2km.definitionQuery = field_name + " = " + test[0]
-		lyr_Buffwet2km.definitionQuery = field_name + " = " + test[0]
-		lyr_wet.definitionQuery = field_name + " = " + test[0]
+		lyr_wet2km.definitionQuery = wet_ID + " = " + test[0]
+		lyr_Buffwet2km.definitionQuery = wet_ID + " = " + test[0]
+		lyr_wet.definitionQuery = wet_ID + " = " + test[0]
 		
 		#get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
 		desc = arcpy.Describe(lyr_wet2km)
@@ -571,7 +571,7 @@ with arcpy.da.UpdateCursor(lyr_wet, [field_name, areabuffer_field, areaLakes_fie
 
 #Calculate Amount Lakes Percent
 calc_lakesPerc = r"(!Arealakes_wi2km!/!TotalArea_wi2km!)*100"
-arcpy.CalculateField_management(lyr_wet, percentLakes_field, calc_lakesPerc)
+arcpy.CalculateField_management(lyr_wet, percentLakes_field, calc_lakesPerc, "PYTHON")
 
 
 ''' End OF21 '''
@@ -606,14 +606,14 @@ arcpy.Clip_analysis(wetbuff_2km, water_union, area_water_wi2km)
 arcpy.MakeFeatureLayer_management(area_water_wi2km,"water2km_lyr")
 lyr_water2km = arcpy.mapping.Layer("water2km_lyr")
 
-with arcpy.da.UpdateCursor(lyr_wet, [field_name, areabuffer_field, areaWater_field]) as cursor:
+with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, areabuffer_field, areaWater_field]) as cursor:
 	for test in cursor:
 		#Set up variable
 		denominator = 0
 		numerator = 0
 		#put a definition query on the lyr_wet and 2km Buffer
-		lyr_water2km.definitionQuery = field_name + " = " + test[0]
-		lyr_wet.definitionQuery = field_name + " = " + test[0]
+		lyr_water2km.definitionQuery = wet_ID + " = " + test[0]
+		lyr_wet.definitionQuery = wet_ID + " = " + test[0]
 		
 		#get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
 		desc = arcpy.Describe(lyr_water2km)
@@ -634,7 +634,7 @@ with arcpy.da.UpdateCursor(lyr_wet, [field_name, areabuffer_field, areaWater_fie
 
 #Calculate Amount Lakes Percent
 calc_lakesPerc = r"(!AreaWetlakes_wi2km!/!TotalArea_wi2km!)*100"
-arcpy.CalculateField_management(lyr_wet, percentWater_field, calc_lakesPerc)
+arcpy.CalculateField_management(lyr_wet, percentWater_field, calc_lakesPerc, "PYTHON")
 
 ''' End OF22 '''
 
@@ -729,8 +729,8 @@ arcpy.AddField_management(freq_BCLCS, BCLCS_Per, "DOUBLE")
 
 #calc percent
 ESI_FWAau_area = 99751581612.32608
-Percent_area = freq_BCLCS_areaFieldName/ESI_FWAau_area
-arcpy.CalculateField_management(freq_BCLCS,BCLCS_Per, Percent_area)
+Percent_area = "!" + freq_BCLCS_areaFieldName + "!/!" + ESI_FWAau_area + "!"
+arcpy.CalculateField_management(freq_BCLCS,BCLCS_Per, Percent_area, "PYTHON")
 
 #create a query layer for the freq table
 arcpy.MakeFeatureLayer_management(freq_BCLCS,"freq_BCLCS_lyr")
