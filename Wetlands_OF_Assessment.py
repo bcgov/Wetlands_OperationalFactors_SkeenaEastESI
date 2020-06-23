@@ -315,7 +315,7 @@ arcpy.SpatialJoin_analysis(wetbuff_10km, lyr_lakes, lakes_join_10km, "JOIN_ONE_T
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_10km, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
+lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "10000")
 
@@ -327,7 +327,7 @@ arcpy.SpatialJoin_analysis(wetbuff_5km, lyr_lakes, lakes_join_5km, "JOIN_ONE_TO_
 #Get the wet_ID that overlap with the 5km Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_5km, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
+lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "5000")
 
@@ -338,7 +338,7 @@ arcpy.SpatialJoin_analysis(wetbuff_2km, lyr_lakes, lakes_join_2km, "JOIN_ONE_TO_
 #Get the wet_ID that overlap with the 2km Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_2km, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
+lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "2000")
 
@@ -349,7 +349,7 @@ arcpy.SpatialJoin_analysis(wetbuff_1km, lyr_lakes, lakes_join_1km, "JOIN_ONE_TO_
 #Get the wet_ID that overlap with the 1km Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_1km, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
+lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "1000")
 
@@ -360,7 +360,7 @@ arcpy.SpatialJoin_analysis(wetbuff_500m, lyr_lakes, lakes_join_500m, "JOIN_ONE_T
 #Get the wet_ID that overlap with the 100m Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_500m, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
+lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "500")
 
@@ -371,7 +371,7 @@ arcpy.SpatialJoin_analysis(wetbuff_100m, lyr_hmn, lakes_join_100m, "JOIN_ONE_TO_
 #Get the wet_ID that overlap with the 100m Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_100m, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_lakes)
+lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "100")
 
@@ -380,12 +380,13 @@ lyr_lakes.definitionQuery = ""
 
 ''' End of OF4 '''
 
+''' For Testing purposes we are removing 
 
-''' OF5 Relative Elevation in Watershed '''
+### OF5 Relative Elevation in Watershed ###
 
 #Watershed Elevation Relief Extraction from CEF Aquatics AUs
 elev_relief = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\CEF\CEF_SSAF_AquaticCE_AU_190404"
-''' Change here for different body of water - HARD CODE'''
+### Change here for different body of water - HARD CODE ###
 
 #Output of Spatial Join
 wet_relief = output_gdb + r"\WetCent_CEF_FWA_au_" + time
@@ -420,7 +421,8 @@ lyr_relief = arcpy.mapping.Layer("relief_lyr")
 
 
 #iterate through the features in wetland relief to populate the relief field
-''' Need to change the relief field if different data'''
+##### Need to change the relief field if different data  #####
+
 with arcpy.da.UpdateCursor(lyr_wet, [wet_ID,"Elev_Relief", "MinElev", "CentroidElev",elev_field	]) as cursor:
 	for test in cursor:
 		
@@ -442,8 +444,9 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID,"Elev_Relief", "MinElev", "CentroidE
 lyr_wet.definitionQuery = ""
 #Populate the field  
 
-''' End of OF5 '''
+### End of OF5 ###
 
+OF 5 '''
 
 ''' OF7 Aspect - Haven't done take average aspect?'''
 ''' End of OF7 '''
@@ -465,7 +468,7 @@ arcpy.SpatialJoin_analysis(wet_comp, karst, karst_join, "JOIN_ONE_TO_MANY", "KEE
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_karst = [row[0] for row in arcpy.da.SearchCursor(karst_join, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_karst)
+lyr_wet.definitionQuery = wet_ID + " IN " + overlap_karst
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, karst_field, "Yes")
 
@@ -490,7 +493,7 @@ arcpy.SpatialJoin_analysis(wet_comp, faults, fault_join, "JOIN_ONE_TO_MANY", "KE
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_fault = [row[0] for row in arcpy.da.SearchCursor(fault_join, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_fault)
+lyr_wet.definitionQuery = wet_ID + " IN " + overlap_fault
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, fault_field, "Yes")
 
@@ -560,8 +563,8 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, areabuffer_field, areaLakes_field])
 		Buff_wet2km_areaFieldName = str(geomField) + "_Area"
 		
 		#iterate through layer with Bu		
-		cursor2 = arcpy.SearchCursor(lyr_Buffwet2km) 
-		for test2 in cursor2:
+		cursor3 = arcpy.SearchCursor(lyr_Buffwet2km) 
+		for test3 in cursor3:
 			denominator = test2.getValue(Buff_wet2km_areaFieldName) + denominator
 		
 		#populate Wetland stuff
@@ -570,8 +573,9 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, areabuffer_field, areaLakes_field])
 
 		cursor.updateRow(test)
 
+lyr_wet.definitionQuery = ""
 #Calculate Amount Lakes Percent
-calc_lakesPerc = r"(!Arealakes_wi2km!/!TotalArea_wi2km!)*100"
+calc_lakesPerc = r"(!Arealakes_wi2km!/!TotalArea_wi2km!)/100"
 arcpy.CalculateField_management(lyr_wet, percentLakes_field, calc_lakesPerc, "PYTHON")
 
 
