@@ -315,7 +315,12 @@ arcpy.SpatialJoin_analysis(wetbuff_10km, lyr_lakes, lakes_join_10km, "JOIN_ONE_T
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_10km, wet_ID)]
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
+
+
+str_lakes_overlap = str(overlap_lakes)
+print str_lakes_overlap
+
+lyr_wet.definitionQuery = wet_ID + " IN " + str_lakes_overlap
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "10000")
 
