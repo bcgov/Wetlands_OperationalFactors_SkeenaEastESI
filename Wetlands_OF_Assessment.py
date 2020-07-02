@@ -55,7 +55,7 @@ arcpy.MakeFeatureLayer_management(wet_comp,"wet_lyr")
 lyr_wet = arcpy.mapping.Layer("wet_lyr")
 
 #VRI
-vri = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T1.5\FormOF_Indicators.gdb\Data\SSAF_Clipped_VRI_R1_2019_200603"
+vri = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T1.5\FormOF_Indicators.gdb\Data\SSAF_VRI_R1_Intersect_200512"
 '''Hardcode VRI - Change'''
 
 '''Buffer the Wetland Complexs to different needs'''
@@ -105,10 +105,11 @@ arcpy.Buffer_analysis(wet_centroid, cent_buff_500m, "500 Meters")
 
 ''' End of Buffering '''
 
-'''OF1 - Process to Calculate Distance to Human Settlement'''
+''' For Testing purposes we are removing 
+###OF1 - Process to Calculate Distance to Human Settlement###
 #Human Settlement Feature
 
-''' Make Changes Here To Human Settlement Feature - HARD CODE'''
+### Make Changes Here To Human Settlement Feature - HARD CODE ###
 HMN_Settle = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\Data\ExtendedSSAF_fwaAU_Hmn_Structure_Density_191001"
 
 #Human Settlement Query Layer
@@ -136,8 +137,17 @@ hmn_join_10km = output_gdb + r"\Wet_HmnWet_10km_buff_" + time
 arcpy.SpatialJoin_analysis(wetbuff_10km, lyr_hmn, hmn_join_10km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_10km, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_settlement]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_settlement = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, hmn_field, "10000")
 
@@ -148,8 +158,17 @@ arcpy.CalculateField_management (lyr_wet, hmn_field, "10000")
 arcpy.SpatialJoin_analysis(wetbuff_5km, lyr_hmn, hmn_join_5km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 5km Buffer
 overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_5km, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_settlement]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_settlement = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, hmn_field, "5000")
 
@@ -159,8 +178,17 @@ arcpy.CalculateField_management (lyr_wet, hmn_field, "5000")
 arcpy.arcpy.SpatialJoin_analysis(wetbuff_2km, lyr_hmn, hmn_join_2km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 2km Buffer
 overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_2km, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_settlement]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_settlement = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, hmn_field, "2000")
 
@@ -170,8 +198,17 @@ arcpy.CalculateField_management (lyr_wet, hmn_field, "2000")
 arcpy.SpatialJoin_analysis(wetbuff_1km, lyr_hmn, hmn_join_1km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 1km Buffer
 overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_1km, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_settlement]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_settlement = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, hmn_field, "1000")
 
@@ -181,8 +218,17 @@ arcpy.CalculateField_management (lyr_wet, hmn_field, "1000")
 arcpy.SpatialJoin_analysis(wetbuff_500m, lyr_hmn, hmn_join_500m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 100m Buffer
 overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_500m, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_settlement]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_settlement = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, hmn_field, "500")
 
@@ -192,19 +238,28 @@ arcpy.CalculateField_management (lyr_wet, hmn_field, "500")
 arcpy.SpatialJoin_analysis(wetbuff_100m, lyr_hmn, hmn_join_100m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 100m Buffer
 overlap_settlement = [row[0] for row in arcpy.da.SearchCursor(hmn_join_100m, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_settlement]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_settlement = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_settlement)
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, hmn_field, "100")
 
 lyr_wet.definitionQuery = ""
 
-''' End OF1 '''
+### End OF1 ###
 
 
-''' OF2 - Distance to Nearest Road '''
+### OF2 - Distance to Nearest Road ###
 
-''' Make Changes Here To Road Feature - HARD CODE'''
+### Make Changes Here To Road Feature - HARD CODE###
 Rds = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\Roads\SSAF_Ext_Clip_ConsRd_inclKispBulk_DSS_190918"
 
 #First add the field (Road w/i) to the copied Wetland Complex
@@ -226,8 +281,17 @@ rd_join_500m = output_gdb + r"\Wet_RdCentroid_500m_buff_" + time
 arcpy.SpatialJoin_analysis(cent_buff_500m, Rds, rd_join_500m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_rd = [row[0] for row in arcpy.da.SearchCursor(rd_join_500m, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_rd]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_rd = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_rd)
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_rd + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, rd_field, "500")
 
@@ -237,8 +301,17 @@ arcpy.CalculateField_management (lyr_wet, rd_field, "500")
 arcpy.SpatialJoin_analysis(cent_buff_100m, Rds, rd_join_100m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_rd = [row[0] for row in arcpy.da.SearchCursor(rd_join_100m, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_rd]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_rd = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_rd)
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_rd + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, rd_field, "100")
 
@@ -248,8 +321,17 @@ arcpy.CalculateField_management (lyr_wet, rd_field, "100")
 arcpy.SpatialJoin_analysis(cent_buff_50m, Rds, rd_join_50m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_rd = [row[0] for row in arcpy.da.SearchCursor(rd_join_50m, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_rd]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_rd = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_rd)
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_rd + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, rd_field, "50")
 
@@ -259,8 +341,17 @@ arcpy.CalculateField_management (lyr_wet, rd_field, "50")
 arcpy.SpatialJoin_analysis(cent_buff_25m, Rds, rd_join_25m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_rd = [row[0] for row in arcpy.da.SearchCursor(rd_join_25m, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_rd]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_rd = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_rd)
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_rd + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, rd_field, "25")
 
@@ -270,33 +361,45 @@ arcpy.CalculateField_management (lyr_wet, rd_field, "25")
 arcpy.SpatialJoin_analysis(cent_buff_10m, Rds, rd_join_10m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_rd = [row[0] for row in arcpy.da.SearchCursor(rd_join_10m, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_rd]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_rd = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_rd)
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_rd + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, rd_field, "10")
 
 lyr_wet.definitionQuery = ""
-''' End OF2 '''
+### End OF2 ###
 
 
-''' OF4 Distance to Large Ponded Water'''
-
+### OF4 Distance to Large Ponded Water###
+'''
 Lakes = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\Data\SSAF_fwaAU_FWA_Lakes_200605"
-''' Change here for different body of water - HARD CODE'''
+### Change here for different body of water - HARD CODE###
 
 #get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
 desc = arcpy.Describe(Lakes)
 geomField = desc.shapeFieldName
 areaFieldName = str(geomField) + "_Area"
 
+
 #Water Body Query Layer
 arcpy.MakeFeatureLayer_management(Lakes,"lakes_layer")
 lyr_lakes = arcpy.mapping.Layer("lakes_layer")
 
-#Query for what is defined as a settlement
+
+'''
+#Query for what is defined as a large body of water
 lyr_lakes.definitionQuery = areaFieldName + "> 80000"
 
-#First add the field (Settlement w/i) to the copied Wetland Complex
+#First add the field Lakes to the copied Wetland Complex
 lakes_field = "OF4_Lakes_Dist"
 arcpy.AddField_management(wet_comp, lakes_field, "DOUBLE")
 
@@ -314,13 +417,17 @@ lakes_join_10km = output_gdb + r"\Wet_lakes_10km_buff_" + time
 arcpy.SpatialJoin_analysis(wetbuff_10km, lyr_lakes, lakes_join_10km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_10km, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_lakes]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_lakes = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
-
-str_lakes_overlap = str(overlap_lakes)
-print str_lakes_overlap
-
-lyr_wet.definitionQuery = wet_ID + " IN " + str_lakes_overlap
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "10000")
 
@@ -331,8 +438,17 @@ arcpy.CalculateField_management (lyr_wet, lakes_field, "10000")
 arcpy.SpatialJoin_analysis(wetbuff_5km, lyr_lakes, lakes_join_5km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 5km Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_5km, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_lakes]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_lakes = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "5000")
 
@@ -342,8 +458,17 @@ arcpy.CalculateField_management (lyr_wet, lakes_field, "5000")
 arcpy.SpatialJoin_analysis(wetbuff_2km, lyr_lakes, lakes_join_2km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 2km Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_2km, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_lakes]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_lakes = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "2000")
 
@@ -353,8 +478,17 @@ arcpy.CalculateField_management (lyr_wet, lakes_field, "2000")
 arcpy.SpatialJoin_analysis(wetbuff_1km, lyr_lakes, lakes_join_1km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 1km Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_1km, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_lakes]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_lakes = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "1000")
 
@@ -364,8 +498,17 @@ arcpy.CalculateField_management (lyr_wet, lakes_field, "1000")
 arcpy.SpatialJoin_analysis(wetbuff_500m, lyr_lakes, lakes_join_500m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 100m Buffer
 overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_500m, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_lakes]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_lakes = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "500")
 
@@ -374,18 +517,27 @@ arcpy.CalculateField_management (lyr_wet, lakes_field, "500")
 #Spatial Join
 arcpy.SpatialJoin_analysis(wetbuff_100m, lyr_hmn, lakes_join_100m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 100m Buffer
-overlap_lakes = [row[0] for row in arcpy.da.SearchCursor(lakes_join_100m, wet_ID)]
+overlap_lakes = (row[0] for row in arcpy.da.SearchCursor(lakes_join_100m, wet_ID))
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_lakes]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_lakes = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + overlap_lakes
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, lakes_field, "100")
 
 lyr_wet.definitionQuery = ""
 lyr_lakes.definitionQuery = ""
 
-''' End of OF4 '''
+### End of OF4 ###
 
-''' For Testing purposes we are removing 
+
 
 ### OF5 Relative Elevation in Watershed ###
 
@@ -432,8 +584,8 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID,"Elev_Relief", "MinElev", "CentroidE
 	for test in cursor:
 		
 		#put a definition query on the lyr_wet
-		lyr_wet.definitionQuery = wet_ID + " = " + str(test[0])
-		lyr_relief.definitionQuery = wet_ID + " = " + str(test[0])
+		lyr_wet.definitionQuery = wet_ID + " = " + str(test[0])[:-2]
+		lyr_relief.definitionQuery = wet_ID + " = " + str(test[0])[:-2]
 		cursor2 = arcpy.SearchCursor(lyr_relief) 
 		for test2 in cursor2:
 			feat1 = test2.getValue("Elev_Relief")
@@ -451,15 +603,16 @@ lyr_wet.definitionQuery = ""
 
 ### End of OF5 ###
 
-OF 5 '''
-
-''' OF7 Aspect - Haven't done take average aspect?'''
-''' End of OF7 '''
 
 
-''' OF19 Karst Geology '''
+### OF7 Aspect - Haven't done take average aspect?###
+### End of OF7 ###
 
-''' Make Changes Here To Human Settlement Feature - HARD CODE'''
+CODE WORKS TO HERE '''  
+
+### OF19 Karst Geology ####
+
+### Make Changes Here To Human Settlement Feature - HARD CODE###
 karst = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T1.5\FormOF_Indicators.gdb\Data\SSAF_fwaAU_Karst_20200507"
 
 #First add the field to the copied Wetland Complex
@@ -472,10 +625,21 @@ karst_join = output_gdb + r"\Wetland_Karst_" + time
 arcpy.SpatialJoin_analysis(wet_comp, karst, karst_join, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_karst = [row[0] for row in arcpy.da.SearchCursor(karst_join, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_karst]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_karst = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + overlap_karst
-#Apply the Distance
-arcpy.CalculateField_management (lyr_wet, karst_field, "Yes")
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_karst + r")"
+
+
+# Replace a layer/table view name with a path to a dataset (which can be a layer file) or create the layer/table view within the script
+# The following inputs are layers or table views: "WetComp_OF_200623"
+arcpy.CalculateField_management(lyr_wet, karst_field, r'"Yes"', r"VB")
 
 lyr_wet.definitionQuery = ""
 
@@ -497,10 +661,20 @@ fault_join = output_gdb + r"\Wetland_GeogFault_" + time
 arcpy.SpatialJoin_analysis(wet_comp, faults, fault_join, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 10km Buffer
 overlap_fault = [row[0] for row in arcpy.da.SearchCursor(fault_join, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_fault]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_fault = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + overlap_fault
-#Apply the Distance
-arcpy.CalculateField_management (lyr_wet, fault_field, "Yes")
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_fault + r")"
+
+# Replace a layer/table view name with a path to a dataset (which can be a layer file) or create the layer/table view within the script
+# The following inputs are layers or table views: "WetComp_OF_200623"
+arcpy.CalculateField_management(lyr_wet, fault_field, r'"Yes"', r"VB")
 
 lyr_wet.definitionQuery = ""
 
@@ -546,7 +720,7 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, areabuffer_field, areaLakes_field])
 		#Set up variable
 		denominator = 0
 		numerator = 0
-		querTest = str(test[0])
+		querTest = str(test[0])[:-2]
 		#put a definition query on the lyr_wet and 2km Buffer
 		lyr_wet2km.definitionQuery = wet_ID + " = " + querTest
 		lyr_Buffwet2km.definitionQuery = wet_ID + " = " + querTest
@@ -570,7 +744,7 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, areabuffer_field, areaLakes_field])
 		#iterate through layer with Bu		
 		cursor3 = arcpy.SearchCursor(lyr_Buffwet2km) 
 		for test3 in cursor3:
-			denominator = test2.getValue(Buff_wet2km_areaFieldName) + denominator
+			denominator = test3.getValue(Buff_wet2km_areaFieldName) + denominator
 		
 		#populate Wetland stuff
 		test[1] = denominator
@@ -580,7 +754,7 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, areabuffer_field, areaLakes_field])
 
 lyr_wet.definitionQuery = ""
 #Calculate Amount Lakes Percent
-calc_lakesPerc = r"(!Arealakes_wi2km!/!TotalArea_wi2km!)/100"
+calc_lakesPerc = r"(!Arealakes_wi2km!/!TotalArea_wi2km!)"
 arcpy.CalculateField_management(lyr_wet, percentLakes_field, calc_lakesPerc, "PYTHON")
 
 
@@ -621,7 +795,7 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, areabuffer_field, areaWater_field])
 		#Set up variable
 		denominator = 0
 		numerator = 0
-		querTest = str(test[0])
+		querTest = str(test[0])[:-2]
 		#put a definition query on the lyr_wet and 2km Buffer
 		lyr_water2km.definitionQuery = wet_ID + " = " + querTest
 		lyr_wet.definitionQuery = wet_ID + " = " + querTest
@@ -632,10 +806,10 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, areabuffer_field, areaWater_field])
 		Buff_water2km_areaFieldName = str(geomField) + "_Area"
 		
 		#iterate through layer with Bu		
-		cursor2 = arcpy.SearchCursor(lyr_water2km) 
-		for test2 in cursor2:
+		cursor4 = arcpy.SearchCursor(lyr_water2km) 
+		for test4 in cursor4:
 		#Iterate through the total area of Wetlands and Lakes
-			numerator = test2.getValue(Buff_water2km_areaFieldName) + numerator
+			numerator = test4.getValue(Buff_water2km_areaFieldName) + numerator
 		
 
 		#Populate Fields
@@ -644,7 +818,7 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, areabuffer_field, areaWater_field])
 		
 
 #Calculate Amount Lakes Percent
-calc_lakesPerc = r"(!AreaWetlakes_wi2km!/!TotalArea_wi2km!)*100"
+calc_lakesPerc = r"(!AreaWetlakes_wi2km!/!TotalArea_wi2km!)"
 arcpy.CalculateField_management(lyr_wet, percentWater_field, calc_lakesPerc, "PYTHON")
 
 ''' End OF22 '''
@@ -673,15 +847,15 @@ arcpy.SpatialJoin_analysis(wet_centroid, vri, site_Index, "JOIN_ONE_TO_MANY", "K
 with arcpy.da.UpdateCursor(site_Index, [wet_ID, "SITE_INDEX"]) as cursor:
 	for test in cursor:
 		#Definition Query for Wetlands
-		lyr_wet.definitionQuery = wet_ID + " = " + str(test[0])
+		lyr_wet.definitionQuery = wet_ID + " = " + str(test[0])[:-2]
 		
 		
 		#iterate through layer with Bu		
 		
-		cursor2 = arcpy.UpdateCursor(lyr_wet) 
-		for test2 in cursor2:
+		cursor5 = arcpy.UpdateCursor(lyr_wet) 
+		for test5 in cursor5:
 		#Iterate through the total area of Wetlands and Lakes
-			test2.setValue(siteIndex_field, test[1])
+			test5.setValue(siteIndex_field, test[1])
 		
 lyr_wet.definitionQuery = ""
 
@@ -700,7 +874,7 @@ BCLCS = output_gdb + r"\BCLCS_VRI_Dissolve_" + time
 
 BCLCS_Interest = "BCLCS_LEVEL_1", "BCLCS_LEVEL_2", "BCLCS_LEVEL_3", "BCLCS_LEVEL_4"
 #dissolve VRI into landcover type codes
-arcpy.Dissolve_management(VRI, BCLCS, BCLCS_Interest)
+arcpy.Dissolve_management(vri, BCLCS, BCLCS_Interest)
 
 #Add BCLCS Level 1 to 4 Concatonated field
 BCLCS_con = "BCLCS_Lev1to4"
@@ -712,7 +886,7 @@ geomField = desc.shapeFieldName
 BCLCS_areaFieldName = str(geomField) + "_Area"
 
 #Calculate Concatonated field for BCLCS
-arcpy.CalculateField_management(BCLCS,BCLCS_con, r"[BCLCS_LEVEL_1] + " " +  [BCLCS_LEVEL_2] + " " + [BCLCS_LEVEL_3] + " " + [BCLCS_LEVEL_4]")
+arcpy.CalculateField_management(BCLCS,BCLCS_con, r"!BCLCS_LEVEL_1! + ' ' +  !BCLCS_LEVEL_2! + ' ' + !BCLCS_LEVEL_3! + ' ' + !BCLCS_LEVEL_4!", "PYTHON")
 
 #BCLCS Frequency Output
 freq_BCLCS = output_gdb + r"\BCLCS_Freq_" + time
@@ -750,12 +924,18 @@ lyr_freq_BCLCS = arcpy.mapping.Layer("freq_BCLCS_lyr")
 # Def Query freq table to only keep the areas with less than 1% across the ESI area
 lyr_freq_BCLCS.definitionQuery = BCLCS_per + " < " + 0.01
 
-#Populat a field of the BCLCS areas that are 'unique'
+#Populate a field of the BCLCS areas that are 'unique'
 BCLCS_rare_defquer = [row[0] for row in arcpy.da.SearchCursor(lyr_freq_BCLCS, BCLCS_con)]
 
-#Query the BCLCS layer to only have rare layers
-lyr_BCLCS.definitionQuery = BCLCS_con + " IN " + str(BCLCS_rare_defquer) 
-
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in BCLCS_rare_defquer]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_BCLCS_rare_defquer = (', '.join(str_NoSquare))
+#Definition Query for Wetlands
+lyr_BCLCS.definitionQuery = BCLCS_con + r" IN (" + str_BCLCS_rare_defquer + r")"
 
 #At 5km
 
@@ -765,8 +945,17 @@ BCLCS_5km = output_gdb + r"\BCLCS_Wet_5km_" + time
 arcpy.SpatialJoin_analysis(wetbuff_5km, lyr_BCLCS, BCLCS_5km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 2km Buffer
 overlap_BCLCS_rare = [row[0] for row in arcpy.da.SearchCursor(BCLCS_5km, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_BCLCS_rare]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_BCLCS_rare = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_BCLCS_rare)
+lyr_BCLCS.definitionQuery = BCLCS_con + r" IN (" + str_overlap_BCLCS_rare + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, uniqueClass_field, "5000")
 
@@ -781,8 +970,17 @@ BCLCS_1km = output_gdb + r"\BCLCS_Wet_1km_" + time
 arcpy.SpatialJoin_analysis(wetbuff_1km, lyr_BCLCS, BCLCS_1km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 2km Buffer
 overlap_BCLCS_rare = [row[0] for row in arcpy.da.SearchCursor(BCLCS_1km, wet_ID)]
+
+#building for the def query just right
+#iterate through list to convert to string w/o .0 at the endswith
+str_NolastTwo = [str(i)[:-2] for i in overlap_BCLCS_rare]
+#remove the square brackets
+str_NoSquare = str_NolastTwo[1:-1]
+#Get rid of quotation marks
+str_overlap_BCLCS_rare = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_wet.definitionQuery = wet_ID + " IN " + str(overlap_BCLCS_rare)
+lyr_BCLCS.definitionQuery = BCLCS_con + r" IN (" + str_overlap_BCLCS_rare + r")"
+
 #Apply the Distance
 arcpy.CalculateField_management (lyr_wet, uniqueClass_field, "1000")
 
@@ -820,7 +1018,7 @@ lyr_union_BCLCS = arcpy.mapping.Layer("union_BCLCS_lyr")
 #iterate through Wet Comp ID
 with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
-		lyr_union_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])
+		lyr_union_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
 			
 		#getcount of BCLCS type
 		num_classes = arcpy.GetCount_management(lyr_union_BCLCS)
@@ -853,7 +1051,7 @@ lyr_union_BCLCS_2km = arcpy.mapping.Layer("union_BCLCS_2km_lyr")
 #iterate through Wet Comp ID
 with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
-		lyr_union_BCLCS_2km.definitionQuery = wet_ID + ' = ' + str(test[0])
+		lyr_union_BCLCS_2km.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
 
 		#getcount of BCLCS type
 		num_classes = arcpy.GetCount_management(lyr_union_BCLCS_2km)
@@ -893,7 +1091,7 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
 		decid_area = 0
 		
-		lyr_decid_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])
+		lyr_decid_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
 		
 		cursor2 = arcpy.SearchCursor(lyr_decid_BCLCS) 
 		#calculate the total area of Decid w/i 100m
@@ -935,7 +1133,7 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
 		conif_area = 0
 		
-		lyr_conif_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])
+		lyr_conif_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
 
 
 		cursor2 = arcpy.SearchCursor(lyr_conif_BCLCS) 
@@ -976,7 +1174,7 @@ mixed_BCLCS_areaFieldName = str(geomField) + "_Area"
 with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
 		mixed_area = 0
-		lyr_mixed_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])
+		lyr_mixed_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
 
 		cursor2 = arcpy.SearchCursor(lyr_mixed_BCLCS) 
 		#calculate the total area of Decid w/i 100m
@@ -1017,7 +1215,7 @@ nonTreed_BCLCS_areaFieldName = str(geomField) + "_Area"
 with arcpy.da.UpdateCursor(wet_comp, [wet_ID,numClass_field]) as cursor:
 	for test in cursor:
 		non_area = 0
-		lyr_nonTreed_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])
+		lyr_nonTreed_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
 		
 		cursor2 = arcpy.SearchCursor(lyr_nonTreed_BCLCS) 
 		#calculate the total area of Decid w/i 100m
