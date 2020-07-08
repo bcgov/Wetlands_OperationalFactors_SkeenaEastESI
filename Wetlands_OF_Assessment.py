@@ -816,10 +816,10 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, areabuffer_field, areaWater_field])
 		test[2] = numerator
 		cursor.updateRow(test)
 		
-
+lyr_wet.definitionQuery = ""
 #Calculate Amount Lakes Percent
-calc_lakesPerc = r"(!AreaWetlakes_wi2km!/!TotalArea_wi2km!)"
-arcpy.CalculateField_management(lyr_wet, percentWater_field, calc_lakesPerc, "PYTHON")
+calc_lakesPerc2 = r"(!AreaWetlakes_wi2km!/!TotalArea_wi2km!)"
+arcpy.CalculateField_management(lyr_wet, percentWater_field, calc_lakesPerc2, "PYTHON")
 
 ''' End OF22 '''
 
@@ -856,7 +856,7 @@ with arcpy.da.UpdateCursor(site_Index, [wet_ID, "SITE_INDEX"]) as cursor:
 		for test5 in cursor5:
 		#Iterate through the total area of Wetlands and Lakes
 			test5.setValue(siteIndex_field, test[1])
-		
+			cursor5.updateRow(test5)
 lyr_wet.definitionQuery = ""
 
 ''' End OF32 '''
@@ -903,18 +903,23 @@ lyr_BCLCS = arcpy.mapping.Layer("BCLCS_lyr")
 uniqueClass_field = "OF39_UniqueClass_Dist"
 arcpy.AddField_management(wet_comp, uniqueClass_field, "DOUBLE")
 
+'''
 #get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
 desc = arcpy.Describe(freq_BCLCS)
 geomField = desc.shapeFieldName
 freq_BCLCS_areaFieldName = str(geomField) + "_Area"
+'''
 
 #Add percent field to query
-BCLCS_per = "BCLCS_Per"
+BCLCS_per = "BCLCS_Percent"
 arcpy.AddField_management(freq_BCLCS, BCLCS_Per, "DOUBLE")
-
+ESI_FWAau_area = 0
 #calc percent
-ESI_FWAau_area = 99751581612.32608
-Percent_area = "!" + freq_BCLCS_areaFieldName + "!/!" + ESI_FWAau_area + "!"
+with arcpy.da.UpdateCursor(site_Index, [BCLCS_areaFieldName]) as cursor:
+	for test in cursor:
+		ESI_FWAau_area = ESI_FWAau_area + test[0]
+
+Percent_area = r"!" + BCLCS_areaFieldName + r"!/" + ESI_FWAau_area 
 arcpy.CalculateField_management(freq_BCLCS,BCLCS_Per, Percent_area, "PYTHON")
 
 #create a query layer for the freq table
