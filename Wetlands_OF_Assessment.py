@@ -911,8 +911,8 @@ freq_BCLCS_areaFieldName = str(geomField) + "_Area"
 '''
 
 #Add percent field to query
-BCLCS_per = "BCLCS_Percent"
-arcpy.AddField_management(freq_BCLCS, BCLCS_Per, "DOUBLE")
+BCLCS_PCNT = r"BCLCS_PCNT"
+arcpy.AddField_management(freq_BCLCS, BCLCS_PCNT, "DOUBLE")
 ESI_FWAau_area = 0
 #calc percent
 with arcpy.da.UpdateCursor(site_Index, [BCLCS_areaFieldName]) as cursor:
@@ -920,14 +920,14 @@ with arcpy.da.UpdateCursor(site_Index, [BCLCS_areaFieldName]) as cursor:
 		ESI_FWAau_area = ESI_FWAau_area + test[0]
 
 Percent_area = r"!" + BCLCS_areaFieldName + r"!/" + ESI_FWAau_area 
-arcpy.CalculateField_management(freq_BCLCS,BCLCS_Per, Percent_area, "PYTHON")
+arcpy.CalculateField_management(freq_BCLCS,BCLCS_PCNT, Percent_area, "PYTHON")
 
 #create a query layer for the freq table
 arcpy.MakeFeatureLayer_management(freq_BCLCS,"freq_BCLCS_lyr")
 lyr_freq_BCLCS = arcpy.mapping.Layer("freq_BCLCS_lyr")
 
 # Def Query freq table to only keep the areas with less than 1% across the ESI area
-lyr_freq_BCLCS.definitionQuery = BCLCS_per + " < " + 0.01
+lyr_freq_BCLCS.definitionQuery = BCLCS_PCNT + " < " + 0.01
 
 #Populate a field of the BCLCS areas that are 'unique'
 BCLCS_rare_defquer = [row[0] for row in arcpy.da.SearchCursor(lyr_freq_BCLCS, BCLCS_con)]
