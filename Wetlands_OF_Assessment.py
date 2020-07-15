@@ -608,7 +608,7 @@ lyr_wet.definitionQuery = ""
 ### OF7 Aspect - Haven't done take average aspect?###
 ### End of OF7 ###
 
-CODE WORKS TO HERE '''  
+
 
 ### OF19 Karst Geology ####
 
@@ -642,13 +642,12 @@ lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_karst + r")"
 arcpy.CalculateField_management(lyr_wet, karst_field, r'"Yes"', r"VB")
 
 lyr_wet.definitionQuery = ""
+### End OF19 ###
 
-''' End OF19 '''
 
+### OF20 Geologic Faults ###
 
-''' OF20 Geologic Faults '''
-
-''' Change here for different body of water - HARD CODE'''
+### Change here for different body of water - HARD CODE###
 faults = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T1.5\FormOF_Indicators.gdb\Data\SSAF_fwaAU_Geologic_Fault_Lines_20200507"
 
 #First add the field to the copied Wetland Complex
@@ -678,7 +677,7 @@ arcpy.CalculateField_management(lyr_wet, fault_field, r'"Yes"', r"VB")
 
 lyr_wet.definitionQuery = ""
 
-''' End OF20 '''
+### End OF20 ###
 
 # Create a 2km Buffer feature layer for the next 2 OFs
 arcpy.MakeFeatureLayer_management(wetbuff_2km,"Buffwet2km_lyr")
@@ -689,7 +688,7 @@ desc = arcpy.Describe(lyr_Buffwet2km)
 geomField = desc.shapeFieldName
 Buffwet2km_areaFieldName = str(geomField) + "_Area"
 
-''' OF21 Percentage of Area lakes w/i 2km of Wetland '''
+###OF21 Percentage of Area lakes w/i 2km of Wetland###
 
 #First add the field to the copied Wetland Complex
 areabuffer_field = "TotalArea_wi2km"
@@ -758,9 +757,9 @@ calc_lakesPerc = r"(!Arealakes_wi2km!/!TotalArea_wi2km!)"
 arcpy.CalculateField_management(lyr_wet, percentLakes_field, calc_lakesPerc, "PYTHON")
 
 
-''' End OF21 '''
+### End OF21 ###
 #Script has run to at least here
-''' OF22 Percentage of Area wetland and lakes w/i 2km of Wetland'''
+### OF22 Percentage of Area wetland and lakes w/i 2km of Wetland###
 
 
 #First add the field to the copied Wetland Complex
@@ -821,19 +820,19 @@ lyr_wet.definitionQuery = ""
 calc_lakesPerc2 = r"(!AreaWetlakes_wi2km!/!TotalArea_wi2km!)"
 arcpy.CalculateField_management(lyr_wet, percentWater_field, calc_lakesPerc2, "PYTHON")
 
-''' End OF22 '''
+### End OF22 ###
 
 
-''' OF28 Species of Conservation Concer'''
+### OF28 Species of Conservation Concer###
 
 #yes/no for plants/communites inside 100m buffer
 #yes/no for waterbird inside 100m buffer
 #yes/no for other bird inside 100m buffer
 
-''' End OF28 '''
+### End OF28 ###
 
 
-''' OF32 Soil Nutrients based on Site Index '''
+### OF32 Soil Nutrients based on Site Index ###
 
 #First add the field to the copied Wetland Complex
 siteIndex_field = "OF32_SiteIndex"
@@ -859,14 +858,15 @@ with arcpy.da.UpdateCursor(site_Index, [wet_ID, "SITE_INDEX"]) as cursor:
 			cursor5.updateRow(test5)
 lyr_wet.definitionQuery = ""
 
-''' End OF32 '''
+##3 End OF32 ###
 
-''' OF33 Position in Landscape '''
+### OF33 Position in Landscape ###
 
 #Not sure how this differs from OF5 in terms of relative position?
 
-''' End OF32 '''
+### End OF32 ###
 
+Works to here'''
 
 '''Hard Code for BCLCS Stuff'''
 #Output Land Class Feature
@@ -915,19 +915,36 @@ BCLCS_PCNT = r"BCLCS_PCNT"
 arcpy.AddField_management(freq_BCLCS, BCLCS_PCNT, "DOUBLE")
 ESI_FWAau_area = 0
 #calc percent
-with arcpy.da.UpdateCursor(site_Index, [BCLCS_areaFieldName]) as cursor:
+with arcpy.da.UpdateCursor(BCLCS, [BCLCS_areaFieldName]) as cursor:
 	for test in cursor:
 		ESI_FWAau_area = ESI_FWAau_area + test[0]
 
-Percent_area = r"!" + BCLCS_areaFieldName + r"!/" + ESI_FWAau_area 
-arcpy.CalculateField_management(freq_BCLCS,BCLCS_PCNT, Percent_area, "PYTHON")
+print ESI_FWAau_area
+
+ESI_Area = "ESI_Area"
+
+arcpy.AddField_management(freq_BCLCS, ESI_Area, "DOUBLE")
+
+arcpy.CalculateField_management(freq_BCLCS, ESI_Area, ESI_FWAau_area, "PYTHON")
+
+
+calc = "!Shape_Area! / !ESI_Area!"
+arcpy.CalculateField_management(freq_BCLCS, BCLCS_PCNT, calc, "PYTHON")
+
+
+#with arcpy.da.UpdateCursor(freq_BCLCS, ["Shape_Area", BCLCS_PCNT]) as cursor:
+#	for test in cursor:
+		#Populate Fields
+#		test[1] = test[0]/ESI_FWAau_area
+#		cursor.updateRow(test)
+	
 
 #create a query layer for the freq table
-arcpy.MakeFeatureLayer_management(freq_BCLCS,"freq_BCLCS_lyr")
-lyr_freq_BCLCS = arcpy.mapping.Layer("freq_BCLCS_lyr")
+arcpy.MakeTableView_management(freq_BCLCS,"freq_BCLCS_lyr")
+lyr_freq_BCLCS = arcpy.mapping.TableView("freq_BCLCS_lyr")
 
 # Def Query freq table to only keep the areas with less than 1% across the ESI area
-lyr_freq_BCLCS.definitionQuery = BCLCS_PCNT + " < " + 0.01
+lyr_freq_BCLCS.definitionQuery = BCLCS_PCNT + " < 0.01"
 
 #Populate a field of the BCLCS areas that are 'unique'
 BCLCS_rare_defquer = [row[0] for row in arcpy.da.SearchCursor(lyr_freq_BCLCS, BCLCS_con)]
@@ -1008,7 +1025,7 @@ arcpy.AddField_management(wet_comp, uniqueClass_field, "DOUBLE")
 ''' OF41 - Number of BCLCS Class 4 fields w/i 100m '''
 #First add the field to the copied Wetland Complex
 numClass_field = "OF41_NumClasses_BCLCSwi100m"
-arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
+arcpy.AddField_management(wet_comp, numClass_field, "LONG")
 
 #output feature
 wetland_BCLCS_100m_union = output_gdb + r"\Wet100m_BCLCS_union_" + time
@@ -1026,7 +1043,8 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 		lyr_union_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
 			
 		#getcount of BCLCS type
-		num_classes = arcpy.GetCount_management(lyr_union_BCLCS)
+		result = arcpy.GetCount_management(lyr_union_BCLCS)
+		num_classes = int(result.getOutput(0))
 		
 		test[1] = num_classes
 		cursor.updateRow(test)
