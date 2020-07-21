@@ -31,13 +31,15 @@ except:
 time = time.strftime("%y%m%d")
 
 #Input Wetland Complex dataset
-wetland_complex_input = arcpy.GetParameterAsText(0)
-
+#wetland_complex_input = arcpy.GetParameterAsText(0)
+wetland_complex_input = r"V:\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T2\SSAF_Wetlands_T2_Data.gdb\SSAF_2020_WetlandComplex_Overlap_FFHpossibleWatershed_200630"
 #Save Location Folder
-output_save = arcpy.GetParameterAsText(1)
+#output_save = arcpy.GetParameterAsText(1)
+output_save = r"V:\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands"
 
 #Wetland Complex Unique ID Field
-wet_ID = arcpy.GetParameterAsText(2)
+#wet_ID = arcpy.GetParameterAsText(2)
+wet_ID = r"Wetland_Complex_ID"
 
 #create geodatabase to work out of
 save_gdb = "Wet_OF_" + time
@@ -951,13 +953,11 @@ BCLCS_rare_defquer = [row[0] for row in arcpy.da.SearchCursor(lyr_freq_BCLCS, BC
 
 #building for the def query just right
 #iterate through list to convert to string w/o .0 at the endswith
-str_NolastTwo = [str(i)[:-2] for i in BCLCS_rare_defquer]
+str_NolastTwo = [str(i) for i in BCLCS_rare_defquer]
 #remove the square brackets
-str_NoSquare = str_NolastTwo[1:-1]
-#Get rid of quotation marks
-str_BCLCS_rare_defquer = (', '.join(str_NoSquare))
-#Definition Query for Wetlands
-lyr_BCLCS.definitionQuery = BCLCS_con + r" IN (" + str_BCLCS_rare_defquer + r")"
+str_NoSquare = str(str_NolastTwo)[1:-1]
+#No need to do all the fancy footwork for string data
+lyr_BCLCS.definitionQuery = BCLCS_con + r" IN (" + str_NoSquare + r")"
 
 #At 5km
 
@@ -976,10 +976,11 @@ str_NoSquare = str_NolastTwo[1:-1]
 #Get rid of quotation marks
 str_overlap_BCLCS_rare = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_BCLCS.definitionQuery = BCLCS_con + r" IN (" + str_overlap_BCLCS_rare + r")"
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_BCLCS_rare + r")"
 
+calc5000 = 5000 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, uniqueClass_field, "5000")
+arcpy.CalculateField_management (lyr_wet, uniqueClass_field, calc5000)
 
 #remove def quer
 lyr_wet.definitionQuery = ""
@@ -991,7 +992,7 @@ BCLCS_1km = output_gdb + r"\BCLCS_Wet_1km_" + time
 #Spatial Join
 arcpy.SpatialJoin_analysis(wetbuff_1km, lyr_BCLCS, BCLCS_1km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 #Get the wet_ID that overlap with the 2km Buffer
-overlap_BCLCS_rare = [row[0] for row in arcpy.da.SearchCursor(BCLCS_1km, wet_ID)]
+overlap_BCLCS_rare = [row[0] for row in arcpy.da.SearchCursor(BCLCS_5km, wet_ID)]
 
 #building for the def query just right
 #iterate through list to convert to string w/o .0 at the endswith
@@ -1001,10 +1002,11 @@ str_NoSquare = str_NolastTwo[1:-1]
 #Get rid of quotation marks
 str_overlap_BCLCS_rare = (', '.join(str_NoSquare))
 #Definition Query for Wetlands
-lyr_BCLCS.definitionQuery = BCLCS_con + r" IN (" + str_overlap_BCLCS_rare + r")"
+lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_BCLCS_rare + r")"
 
+calc1000 = 1000
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, uniqueClass_field, "1000")
+arcpy.CalculateField_management (lyr_wet, uniqueClass_field, calc1000)
 
 #remove def quer
 lyr_wet.definitionQuery = ""
@@ -1030,7 +1032,7 @@ arcpy.AddField_management(wet_comp, numClass_field, "LONG")
 #output feature
 wetland_BCLCS_100m_union = output_gdb + r"\Wet100m_BCLCS_union_" + time
 #union wetlands and BCLCS
-arcpy.Union_analysis([BCLCS, wetbuff_100m], wetland_BCLCS_100m_union)
+arcpy.Union_analysis([lyr_BCLCS, wetbuff_100m], wetland_BCLCS_100m_union)
 
 #create a def queryable layer from the union
 arcpy.MakeFeatureLayer_management(wetland_BCLCS_100m_union,"union_BCLCS_lyr")
@@ -1064,7 +1066,7 @@ arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
 #output feature
 wetland_BCLCS_2km_union = output_gdb + r"\Wet2km_BCLCS_union_" + time
 #union wetlands and BCLCS
-arcpy.Union_analysis([BCLCS, wetbuff_2km], wetland_BCLCS_2km_union)
+arcpy.Union_analysis([lyr_BCLCS, wetbuff_2km], wetland_BCLCS_2km_union)
 
 #create a def queryable layer from the union
 arcpy.MakeFeatureLayer_management(wetland_BCLCS_2km_union,"union_BCLCS_2km_lyr")
