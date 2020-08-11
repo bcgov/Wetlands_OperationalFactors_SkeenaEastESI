@@ -955,9 +955,11 @@ BCLCS_rare_defquer = [row[0] for row in arcpy.da.SearchCursor(lyr_freq_BCLCS, BC
 #iterate through list to convert to string w/o .0 at the endswith
 str_NolastTwo = [str(i) for i in BCLCS_rare_defquer]
 #remove the square brackets
-str_NoSquare = str(str_NolastTwo)[1:-1]
+str_baseNoSquare = str(str_NolastTwo)[1:-1]
+print str_NoSquare
+
 #No need to do all the fancy footwork for string data
-lyr_BCLCS.definitionQuery = BCLCS_con + r" IN (" + str_NoSquare + r")"
+lyr_BCLCS.definitionQuery = BCLCS_con + r" IN (" + str_baseNoSquare + r")"
 
 #At 5km
 
@@ -965,8 +967,16 @@ lyr_BCLCS.definitionQuery = BCLCS_con + r" IN (" + str_NoSquare + r")"
 BCLCS_5km = output_gdb + r"\BCLCS_Wet_5km_" + time
 #Spatial Join
 arcpy.SpatialJoin_analysis(wetbuff_5km, lyr_BCLCS, BCLCS_5km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+
+#create a query layer for 5km
+arcpy.MakeFeatureLayer_management(BCLCS_5km,"BCLCS5km_lyr")
+lyr_5kmBCLCS = arcpy.mapping.Layer("BCLCS5km_lyr")
+
+#Only have rare overlap
+lyr_5kmBCLCS.definitionQuery = BCLCS_con + r" IN (" + str_baseNoSquare + r")"
+
 #Get the wet_ID that overlap with the 2km Buffer
-overlap_BCLCS_rare = [row[0] for row in arcpy.da.SearchCursor(BCLCS_5km, wet_ID)]
+overlap_BCLCS_rare = [row[0] for row in arcpy.da.SearchCursor(lyr_5kmBCLCS, wet_ID)]
 
 #building for the def query just right
 #iterate through list to convert to string w/o .0 at the endswith
@@ -991,8 +1001,16 @@ lyr_wet.definitionQuery = ""
 BCLCS_1km = output_gdb + r"\BCLCS_Wet_1km_" + time
 #Spatial Join
 arcpy.SpatialJoin_analysis(wetbuff_1km, lyr_BCLCS, BCLCS_1km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+
+#create a query layer for 5km
+arcpy.MakeFeatureLayer_management(BCLCS_1km,"BCLCS5km_lyr")
+lyr_1kmBCLCS = arcpy.mapping.Layer("BCLCS5km_lyr")
+
+#Only have rare overlap
+lyr_1kmBCLCS.definitionQuery = BCLCS_con + r" IN (" + str_baseNoSquare + r")"
+
 #Get the wet_ID that overlap with the 2km Buffer
-overlap_BCLCS_rare = [row[0] for row in arcpy.da.SearchCursor(BCLCS_5km, wet_ID)]
+overlap_BCLCS_rare = [row[0] for row in arcpy.da.SearchCursor(lyr_1kmBCLCS, wet_ID)]
 
 #building for the def query just right
 #iterate through list to convert to string w/o .0 at the endswith
@@ -1030,9 +1048,11 @@ numClass_field = "OF41_NumClasses_BCLCSwi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "LONG")
 
 #output feature
-wetland_BCLCS_100m_union = output_gdb + r"\Wet100m_BCLCS_union_" + time
+wetland_BCLCS_100m_union = output_gdb + r"\Wet100m_BCLCS_intersect_" + time
 #union wetlands and BCLCS
-arcpy.Union_analysis([lyr_BCLCS, wetbuff_100m], wetland_BCLCS_100m_union)
+#arcpy.Union_analysis([lyr_BCLCS, wetbuff_100m], wetland_BCLCS_100m_union)
+#Using intersect to try to reduce time
+arcpy.Intersect_analysis([lyr_BCLCS, wetbuff_100m], wetland_BCLCS_100m_union, "ALL")
 
 #create a def queryable layer from the union
 arcpy.MakeFeatureLayer_management(wetland_BCLCS_100m_union,"union_BCLCS_lyr")
@@ -1066,7 +1086,7 @@ arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
 #output feature
 wetland_BCLCS_2km_union = output_gdb + r"\Wet2km_BCLCS_union_" + time
 #union wetlands and BCLCS
-arcpy.Union_analysis([lyr_BCLCS, wetbuff_2km], wetland_BCLCS_2km_union)
+arcpy.Intersect_analysis([lyr_BCLCS, wetbuff_2km], wetland_BCLCS_2km_union, "ALL")
 
 #create a def queryable layer from the union
 arcpy.MakeFeatureLayer_management(wetland_BCLCS_2km_union,"union_BCLCS_2km_lyr")
@@ -1173,7 +1193,7 @@ lyr_BCLCS.definitionQuery = r""
 
 ''' End OF44 '''
 
-''' Not a OF, but Mixed Treed '''
+''' Not an OF, but Mixed Treed '''
 #First add the field to the copied Wetland Complex
 numClass_field = "OFxx_MixedTreeArea_BCLCS_wi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
