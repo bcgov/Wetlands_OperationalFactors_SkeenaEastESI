@@ -899,18 +899,13 @@ arcpy.Frequency_analysis(BCLCS, freq_BCLCS, BCLCS_con, BCLCS_areaFieldName)
 arcpy.MakeFeatureLayer_management(BCLCS,"BCLCS_lyr")
 lyr_BCLCS = arcpy.mapping.Layer("BCLCS_lyr")
 
-''' OF39 VRI Class Unquieness - Using BCLCS Classes 1-4 '''
+''' Works
+###OF39 VRI Class Unquieness - Using BCLCS Classes 1-4
 
 #First add the field to the copied Wetland Complex
 uniqueClass_field = "OF39_UniqueClass_Dist"
 arcpy.AddField_management(wet_comp, uniqueClass_field, "DOUBLE")
 
-'''
-#get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
-desc = arcpy.Describe(freq_BCLCS)
-geomField = desc.shapeFieldName
-freq_BCLCS_areaFieldName = str(geomField) + "_Area"
-'''
 
 #Add percent field to query
 BCLCS_PCNT = r"BCLCS_PCNT"
@@ -1029,20 +1024,22 @@ arcpy.CalculateField_management (lyr_wet, uniqueClass_field, calc1000)
 #remove def quer
 lyr_wet.definitionQuery = ""
 lyr_BCLCS.definitionQuery = ""
-''' End OF39 '''
 
-''' OF40 - Maximum Dominance of BCLCS Class 4 '''
+### End OF39
+
+
+
+###OF40 - Maximum Dominance of BCLCS Class 4
 uniqueClass_field = "OF40_MaxDom_BCLCS"
 arcpy.AddField_management(wet_comp, uniqueClass_field, "DOUBLE")
 
 #Gotta think about more
 
+###End OF40
 
 
-''' End OF40 '''
+###OF41 - Number of BCLCS Class 4 fields w/i 100m 
 
-
-''' OF41 - Number of BCLCS Class 4 fields w/i 100m '''
 #First add the field to the copied Wetland Complex
 numClass_field = "OF41_NumClasses_BCLCSwi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "LONG")
@@ -1074,10 +1071,11 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 
 lyr_union_BCLCS.definitionQuery = ""
 
-''' End OF41 '''
+#End OF41 
 
+Works to here'''
 
-''' OF42 - Number of BCLCS Class 4 fields w/i 2km '''
+### OF42 - Number of BCLCS Class 4 fields w/i 2km
 
 #First add the field to the copied Wetland Complex
 numClass_field = "OF42_NumClasses_BCLCSwi2km"
@@ -1099,7 +1097,8 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 		lyr_union_BCLCS_2km.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
 
 		#getcount of BCLCS type
-		num_classes = arcpy.GetCount_management(lyr_union_BCLCS_2km)
+		result = arcpy.GetCount_management(lyr_union_BCLCS_2km)
+		num_classes = int(result.getOutput(0))
 		
 		test[1] = num_classes
 		cursor.updateRow(test)
