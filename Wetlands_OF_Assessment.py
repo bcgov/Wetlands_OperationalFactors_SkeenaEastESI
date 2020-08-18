@@ -1047,9 +1047,9 @@ arcpy.AddField_management(wet_comp, numClass_field, "LONG")
 #output feature
 wetland_BCLCS_100m_union = output_gdb + r"\Wet100m_BCLCS_intersect_" + time
 #union wetlands and BCLCS
-#arcpy.Union_analysis([lyr_BCLCS, wetbuff_100m], wetland_BCLCS_100m_union)
-#Using intersect to try to reduce time
-arcpy.Intersect_analysis([lyr_BCLCS, wetbuff_100m], wetland_BCLCS_100m_union, "ALL")
+arcpy.Union_analysis([lyr_BCLCS, wetbuff_100m], wetland_BCLCS_100m_union)
+#Using intersect to try to reduce time - Does not REDCUE TIME
+#arcpy.Intersect_analysis([lyr_BCLCS, wetbuff_100m], wetland_BCLCS_100m_union, "ALL")
 
 #create a def queryable layer from the union
 arcpy.MakeFeatureLayer_management(wetland_BCLCS_100m_union,"union_BCLCS_lyr")
@@ -1084,7 +1084,7 @@ arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
 #output feature
 wetland_BCLCS_2km_union = output_gdb + r"\Wet2km_BCLCS_union_" + time
 #union wetlands and BCLCS
-arcpy.Intersect_analysis([lyr_BCLCS, wetbuff_2km], wetland_BCLCS_2km_union, "ALL")
+arcpy.Union_analysis([lyr_BCLCS, wetbuff_2km], wetland_BCLCS_2km_union, "ALL")
 
 #create a def queryable layer from the union
 arcpy.MakeFeatureLayer_management(wetland_BCLCS_2km_union,"union_BCLCS_2km_lyr")
