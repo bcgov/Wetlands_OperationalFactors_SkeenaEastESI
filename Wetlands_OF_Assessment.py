@@ -35,7 +35,7 @@ time = time.strftime("%y%m%d")
 wetland_complex_input = r"V:\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T2\SSAF_Wetlands_T2_Data.gdb\SSAF_2020_WetlandComplex_Overlap_FFHpossibleWatershed_200630"
 #Save Location Folder
 #output_save = arcpy.GetParameterAsText(1)
-output_save = r"V:\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands"
+output_save = r"V:\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T1.5"
 
 #Wetland Complex Unique ID Field
 #wet_ID = arcpy.GetParameterAsText(2)
@@ -1084,7 +1084,10 @@ arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
 #output feature
 wetland_BCLCS_2km_union = output_gdb + r"\Wet2km_BCLCS_union_" + time
 #union wetlands and BCLCS
-arcpy.Union_analysis([lyr_BCLCS, wetbuff_2km], wetland_BCLCS_2km_union, "ALL")
+#Union causing issues... Repair Geometry of Both
+arcpy.RepairGeometry_management(lyr_BCLCS)
+arcpy.RepairGeometry_management(wetbuff_2km)
+arcpy.Union_analysis([lyr_BCLCS, wetbuff_2km], wetland_BCLCS_2km_union)
 
 #create a def queryable layer from the union
 arcpy.MakeFeatureLayer_management(wetland_BCLCS_2km_union,"union_BCLCS_2km_lyr")
