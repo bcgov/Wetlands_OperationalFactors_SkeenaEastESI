@@ -998,8 +998,8 @@ BCLCS_1km = output_gdb + r"\BCLCS_Wet_1km_" + time
 arcpy.SpatialJoin_analysis(wetbuff_1km, lyr_BCLCS, BCLCS_1km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 
 #create a query layer for 5km
-arcpy.MakeFeatureLayer_management(BCLCS_1km,"BCLCS5km_lyr")
-lyr_1kmBCLCS = arcpy.mapping.Layer("BCLCS5km_lyr")
+arcpy.MakeFeatureLayer_management(BCLCS_1km,"BCLCS1km_lyr")
+lyr_1kmBCLCS = arcpy.mapping.Layer("BCLCS1km_lyr")
 
 #Only have rare overlap
 lyr_1kmBCLCS.definitionQuery = BCLCS_con + r" IN (" + str_baseNoSquare + r")"
@@ -1045,15 +1045,18 @@ numClass_field = "OF41_NumClasses_BCLCSwi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "LONG")
 
 #output feature
-wetland_BCLCS_100m_union = output_gdb + r"\Wet100m_BCLCS_intersect_" + time
+wetland_BCLCS_100m = output_gdb + r"\Wet100m_BCLCS_intersect_" + time
 #union wetlands and BCLCS
-arcpy.Union_analysis([lyr_BCLCS, wetbuff_100m], wetland_BCLCS_100m_union)
+#arcpy.Union_analysis([lyr_BCLCS, wetbuff_100m], wetland_BCLCS_100m_union)
 #Using intersect to try to reduce time - Does not REDCUE TIME
 #arcpy.Intersect_analysis([lyr_BCLCS, wetbuff_100m], wetland_BCLCS_100m_union, "ALL")
 
+#Spatial Join
+arcpy.SpatialJoin_analysis(wetbuff_100m, lyr_BCLCS, wetland_BCLCS_100m, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+
 #create a def queryable layer from the union
-arcpy.MakeFeatureLayer_management(wetland_BCLCS_100m_union,"union_BCLCS_lyr")
-lyr_union_BCLCS = arcpy.mapping.Layer("union_BCLCS_lyr")
+arcpy.MakeFeatureLayer_management(wetland_BCLCS_100m,"wetland_BCLCS_100m_lyr")
+lyr_wet_BCLCS_100m = arcpy.mapping.Layer("wetland_BCLCS_100m_lyr")
 
 
 #iterate through Wet Comp ID
@@ -1082,31 +1085,34 @@ numClass_field = "OF42_NumClasses_BCLCSwi2km"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
 
 #output feature
-wetland_BCLCS_2km_union = output_gdb + r"\Wet2km_BCLCS_union_" + time
+BCLCS_2km = output_gdb + r"\Wet2km_BCLCS_intersect" + time
 #union wetlands and BCLCS
-#Union causing issues... Repair Geometry of Both
-arcpy.RepairGeometry_management(lyr_BCLCS)
-arcpy.RepairGeometry_management(wetbuff_2km)
-arcpy.Union_analysis([lyr_BCLCS, wetbuff_2km], wetland_BCLCS_2km_union)
+
+#Union causing issues... Repair Geometry of Both Doesn't seem to help.
+#arcpy.RepairGeometry_management(lyr_BCLCS)
+#arcpy.RepairGeometry_management(wetbuff_2km)
+
+#Spatial Join
+arcpy.SpatialJoin_analysis(wetbuff_2km, lyr_BCLCS, BCLCS_2km, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
 
 #create a def queryable layer from the union
-arcpy.MakeFeatureLayer_management(wetland_BCLCS_2km_union,"union_BCLCS_2km_lyr")
-lyr_union_BCLCS_2km = arcpy.mapping.Layer("union_BCLCS_2km_lyr")
+arcpy.MakeFeatureLayer_management(BCLCS_2km,"BCLCS_2km_lyr")
+lyr_wet_BCLCS_2km = arcpy.mapping.Layer("BCLCS_2km_lyr")
 
 
 #iterate through Wet Comp ID
 with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
-		lyr_union_BCLCS_2km.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
+		lyr_wet_BCLCS_2km.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
 
 		#getcount of BCLCS type
-		result = arcpy.GetCount_management(lyr_union_BCLCS_2km)
+		result = arcpy.GetCount_management(lyr_wet_BCLCS_2km)
 		num_classes = int(result.getOutput(0))
 		
 		test[1] = num_classes
 		cursor.updateRow(test)
 
-lyr_union_BCLCS_2km.definitionQuery = ""
+lyr_wet_BCLCS_2km.definitionQuery = ""
 
 ''' End OF42 '''
 
