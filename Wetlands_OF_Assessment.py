@@ -1076,7 +1076,7 @@ lyr_union_BCLCS.definitionQuery = ""
 
 #End OF41 
 
-Works to here'''
+
 
 ### OF42 - Number of BCLCS Class 4 fields w/i 2km
 
@@ -1114,9 +1114,10 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 
 lyr_wet_BCLCS_2km.definitionQuery = ""
 
-''' End OF42 '''
+# End OF42 #
 
-''' OF 43 Amount of Decidious w/i 100m '''
+
+# OF 43 Amount of Decidious w/i 100m #
 
 #First add the field to the copied Wetland Complex
 numClass_field = "OF43_DecidiousArea_BCLCS_wi100m"
@@ -1156,8 +1157,9 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, numClass_field]) as cursor:
 
 lyr_BCLCS.definitionQuery = r""
 
-''' End OF43 '''
+# End OF43 
 
+Works to here'''
 
 ''' OF44 - Amount of Coniferious w/i 100m '''
 #First add the field to the copied Wetland Complex
@@ -1167,7 +1169,7 @@ arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
 #Definition query on decidious (aka Broadleaf)
 lyr_BCLCS.definitionQuery = r"BCLCS_LEVEL_4 = 'TC'"
 #output clip
-area_conifer_wi100m = output_gdb + r"\conifer_clip_100m_" + time
+area_conifer_wi100m = output_gdb + r"\conifer_clip_" + time
 
 #clip
 arcpy.Clip_analysis(wetbuff_100m, lyr_BCLCS, area_conifer_wi100m)
