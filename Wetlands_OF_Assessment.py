@@ -1159,9 +1159,9 @@ lyr_BCLCS.definitionQuery = r""
 
 # End OF43 
 
-Works to here'''
 
-''' OF44 - Amount of Coniferious w/i 100m '''
+
+### OF44 - Amount of Coniferious w/i 100m 
 #First add the field to the copied Wetland Complex
 numClass_field = "OF44_ConiferousArea_BCLCS_wi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
@@ -1201,9 +1201,9 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 		
 lyr_BCLCS.definitionQuery = r""
 
-''' End OF44 '''
+### End OF44 
 
-''' Not an OF, but Mixed Treed '''
+### Not an OF, but Mixed Treed
 #First add the field to the copied Wetland Complex
 numClass_field = "OFxx_MixedTreeArea_BCLCS_wi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
@@ -1241,8 +1241,8 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 lyr_BCLCS.definitionQuery = r""
 
 
-''' End of Extra Info '''
-
+### End of Extra Info 
+Works to here'''
 
 ''' OF45 - Amount of NonTreed Veg w/i 100m '''
 #First add the field to the copied Wetland Complex
@@ -1250,7 +1250,7 @@ numClass_field = "OF45_NonTreedVegArea_BCLCS_wi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
 
 #Definition query on decidious (aka Broadleaf)
-lyr_BCLCS.definitionQuery = r"BCLCS_LEVEL_4 NOT IN ('TC', 'TM', 'TB')"
+lyr_BCLCS.definitionQuery = r"BCLCS_LEVEL_1 = 'V' AND BCLCS_LEVEL_2 = 'N'"
 #output clip
 area_NonTree_wi100m = output_gdb + r"\NonTreeVeg_clip_100m_" + time
 
