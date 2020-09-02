@@ -1252,7 +1252,7 @@ arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
 #Definition query on decidious (aka Broadleaf)
 lyr_BCLCS.definitionQuery = r"BCLCS_LEVEL_1 = 'V' AND BCLCS_LEVEL_2 = 'N'"
 #output clip
-area_NonTree_wi100m = output_gdb + r"\NonTreeVeg_clip_100m_" + time
+area_NonTree_wi100m = output_gdb + r"\NonTreeVeg"
 
 #clip
 arcpy.Clip_analysis(wetbuff_100m, lyr_BCLCS, area_NonTree_wi100m)
