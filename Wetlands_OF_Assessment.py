@@ -107,7 +107,7 @@ arcpy.Buffer_analysis(wet_centroid, cent_buff_500m, "500 Meters")
 
 ''' End of Buffering '''
 
-''' For Testing purposes we are removing 
+
 ###OF1 - Process to Calculate Distance to Human Settlement###
 #Human Settlement Feature
 
@@ -151,8 +151,10 @@ str_overlap_settlement = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "10000")
+arcpy.CalculateField_management (lyr_wet, hmn_field, "10000", r"PYTHON")
 
+# Replace a layer/table view name with a path to a dataset (which can be a layer file) or create the layer/table view within the script
+# The following inputs are layers or table views: "Wet_HmnWet_10km_buff_200911"
 
 #At 5km
 
@@ -172,7 +174,7 @@ str_overlap_settlement = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "5000")
+arcpy.CalculateField_management (lyr_wet, hmn_field, "5000", r"PYTHON")
 
 #At 2km
 
@@ -192,7 +194,7 @@ str_overlap_settlement = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "2000")
+arcpy.CalculateField_management (lyr_wet, hmn_field, "2000", r"PYTHON")
 
 #At 1km
 
@@ -212,7 +214,7 @@ str_overlap_settlement = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "1000")
+arcpy.CalculateField_management (lyr_wet, hmn_field, "1000", r"PYTHON")
 
 #At 500m
 
@@ -232,7 +234,7 @@ str_overlap_settlement = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "500")
+arcpy.CalculateField_management (lyr_wet, hmn_field, "500", r"PYTHON")
 
 #At 100m
 
@@ -252,7 +254,7 @@ str_overlap_settlement = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_settlement + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, hmn_field, "100")
+arcpy.CalculateField_management (lyr_wet, hmn_field, "100", r"PYTHON")
 
 lyr_wet.definitionQuery = ""
 
@@ -295,7 +297,7 @@ str_overlap_rd = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_rd + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, rd_field, "500")
+arcpy.CalculateField_management (lyr_wet, rd_field, "500", r"PYTHON")
 
 #At 100m
 
@@ -315,7 +317,7 @@ str_overlap_rd = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_rd + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, rd_field, "100")
+arcpy.CalculateField_management (lyr_wet, rd_field, "100", r"PYTHON")
 
 #At 50m
 
@@ -335,7 +337,7 @@ str_overlap_rd = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_rd + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, rd_field, "50")
+arcpy.CalculateField_management (lyr_wet, rd_field, "50", r"PYTHON")
 
 #At 25m
 
@@ -355,7 +357,7 @@ str_overlap_rd = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_rd + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, rd_field, "25")
+arcpy.CalculateField_management (lyr_wet, rd_field, "25", r"PYTHON")
 
 #At 10m
 
@@ -375,14 +377,14 @@ str_overlap_rd = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_rd + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, rd_field, "10")
+arcpy.CalculateField_management (lyr_wet, rd_field, "10", r"PYTHON")
 
 lyr_wet.definitionQuery = ""
 ### End OF2 ###
 
 
 ### OF4 Distance to Large Ponded Water###
-'''
+
 Lakes = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\Data\SSAF_fwaAU_FWA_Lakes_200605"
 ### Change here for different body of water - HARD CODE###
 
@@ -397,7 +399,7 @@ arcpy.MakeFeatureLayer_management(Lakes,"lakes_layer")
 lyr_lakes = arcpy.mapping.Layer("lakes_layer")
 
 
-'''
+
 #Query for what is defined as a large body of water
 lyr_lakes.definitionQuery = areaFieldName + "> 80000"
 
@@ -431,7 +433,7 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, "10000")
+arcpy.CalculateField_management (lyr_wet, lakes_field, '10000', r"VB")
 
 
 #At 5km
@@ -452,7 +454,7 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, "5000")
+arcpy.CalculateField_management (lyr_wet, lakes_field, '5000', r"VB")
 
 #At 2km
 
@@ -472,7 +474,7 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, "2000")
+arcpy.CalculateField_management (lyr_wet, lakes_field, '2000', r"VB")
 
 #At 1km
 
@@ -492,7 +494,7 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, "1000")
+arcpy.CalculateField_management (lyr_wet, lakes_field, r'1000', r"VB")
 
 #At 500m
 
@@ -512,7 +514,7 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, "500")
+arcpy.CalculateField_management (lyr_wet, lakes_field, r'500', r"VB")
 
 #At 100m
 
@@ -532,14 +534,14 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, "100")
+arcpy.CalculateField_management (lyr_wet, lakes_field, r'100', r"VB")
 
 lyr_wet.definitionQuery = ""
 lyr_lakes.definitionQuery = ""
 
 ### End of OF4 ###
 
-
+''' For Testing purposes we are removing 
 
 ### OF5 Relative Elevation in Watershed ###
 
@@ -1076,7 +1078,7 @@ lyr_union_BCLCS.definitionQuery = ""
 
 #End OF41 
 
-
+'''
 
 ### OF42 - Number of BCLCS Class 4 fields w/i 2km
 
@@ -1116,7 +1118,7 @@ lyr_wet_BCLCS_2km.definitionQuery = ""
 
 # End OF42 #
 
-
+'''
 # OF 43 Amount of Decidious w/i 100m #
 
 #First add the field to the copied Wetland Complex
@@ -1242,9 +1244,10 @@ lyr_BCLCS.definitionQuery = r""
 
 
 ### End of Extra Info 
-Works to here'''
 
-''' OF45 - Amount of NonTreed Veg w/i 100m '''
+
+# OF45 - Amount of NonTreed Veg w/i 100m
+
 #First add the field to the copied Wetland Complex
 numClass_field = "OF45_NonTreedVegArea_BCLCS_wi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
@@ -1283,5 +1286,5 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID,numClass_field]) as cursor:
 
 lyr_BCLCS.definitionQuery = r""
 
-''' End OF45 '''
-
+# End OF45
+Works to here'''
