@@ -57,7 +57,7 @@ arcpy.MakeFeatureLayer_management(wet_comp,"wet_lyr")
 lyr_wet = arcpy.mapping.Layer("wet_lyr")
 
 #VRI
-vri = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T1.5\FormOF_Indicators.gdb\Data\SSAF_VRI_R1_Intersect_200512"
+vri = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\Data\SSAF_VRI_R1_Intersect_200512"
 '''Hardcode VRI - Change'''
 
 '''Buffer the Wetland Complexs to different needs'''
@@ -433,7 +433,7 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, '10000', r"VB")
+arcpy.CalculateField_management (lyr_wet, lakes_field, '10000', r"PYTHON")
 
 
 #At 5km
@@ -454,7 +454,7 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, '5000', r"VB")
+arcpy.CalculateField_management (lyr_wet, lakes_field, '5000', r"PYTHON")
 
 #At 2km
 
@@ -474,7 +474,7 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, '2000', r"VB")
+arcpy.CalculateField_management (lyr_wet, lakes_field, '2000', r"PYTHON")
 
 #At 1km
 
@@ -494,7 +494,7 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, r'1000', r"VB")
+arcpy.CalculateField_management (lyr_wet, lakes_field, r'1000',  r"PYTHON")
 
 #At 500m
 
@@ -514,7 +514,7 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, r'500', r"VB")
+arcpy.CalculateField_management (lyr_wet, lakes_field, r'500', r"PYTHON")
 
 #At 100m
 
@@ -534,7 +534,7 @@ str_overlap_lakes = (', '.join(str_NoSquare))
 lyr_wet.definitionQuery = wet_ID + r" IN (" + str_overlap_lakes + r")"
 
 #Apply the Distance
-arcpy.CalculateField_management (lyr_wet, lakes_field, r'100', r"VB")
+arcpy.CalculateField_management (lyr_wet, lakes_field, r'100', r"PYTHON")
 
 lyr_wet.definitionQuery = ""
 lyr_lakes.definitionQuery = ""
@@ -616,8 +616,8 @@ lyr_wet.definitionQuery = ""
 
 ### OF19 Karst Geology ####
 
-### Make Changes Here To Human Settlement Feature - HARD CODE###
-karst = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T1.5\FormOF_Indicators.gdb\Data\SSAF_fwaAU_Karst_20200507"
+### Make Changes Here To Karst Feature - HARD CODE###
+karst = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\Data\SSAF_fwaAU_Karst_20200507"
 
 #First add the field to the copied Wetland Complex
 karst_field = "OF19_Karst"
@@ -652,7 +652,7 @@ lyr_wet.definitionQuery = ""
 ### OF20 Geologic Faults ###
 
 ### Change here for different body of water - HARD CODE###
-faults = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T1.5\FormOF_Indicators.gdb\Data\SSAF_fwaAU_Geologic_Fault_Lines_20200507"
+faults = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\Data\SSAF_fwaAU_Geologic_Fault_Lines_20200507"
 
 #First add the field to the copied Wetland Complex
 fault_field = "OF20_GeogFault"
