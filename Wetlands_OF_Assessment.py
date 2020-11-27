@@ -31,15 +31,15 @@ except:
 time = time.strftime("%y%m%d")
 
 #Input Wetland Complex dataset
-#wetland_complex_input = arcpy.GetParameterAsText(0)
-wetland_complex_input = r"V:\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T2\SSAF_Wetlands_T2_Data.gdb\SSAF_2020_WetlandComplex_Overlap_FFHpossibleWatershed_200630"
+wetland_complex_input = arcpy.GetParameterAsText(0)
+#wetland_complex_input = r"V:\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T2\SSAF_Wetlands_T2_Data.gdb\SSAF_2020_WetlandComplex_Overlap_FFHpossibleWatershed_200630"
 #Save Location Folder
-#output_save = arcpy.GetParameterAsText(1)
-output_save = r"V:\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T1.5"
+output_save = arcpy.GetParameterAsText(1)
+#output_save = r"V:\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T1.5"
 
 #Wetland Complex Unique ID Field
-#wet_ID = arcpy.GetParameterAsText(2)
-wet_ID = r"Wetland_Complex_ID"
+wet_ID = arcpy.GetParameterAsText(2)
+#wet_ID = r"Wetland_Complex_ID"
 
 #create geodatabase to work out of
 save_gdb = "Wet_OF_" + time
@@ -541,12 +541,12 @@ lyr_lakes.definitionQuery = ""
 
 ### End of OF4 ###
 
-''' For Testing purposes we are removing 
+
 
 ### OF5 Relative Elevation in Watershed ###
 
 #Watershed Elevation Relief Extraction from CEF Aquatics AUs
-elev_relief = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\CEF\CEF_SSAF_AquaticCE_AU_190404"
+elev_relief = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\CEF_2015\CEF_SSAF_AquaticCE_AU_190404"
 ### Change here for different body of water - HARD CODE ###
 
 #Output of Spatial Join
@@ -870,7 +870,7 @@ lyr_wet.definitionQuery = ""
 
 ### End OF32 ###
 
-Works to here'''
+
 
 '''Hard Code for BCLCS Stuff'''
 #Output Land Class Feature
@@ -901,7 +901,7 @@ arcpy.Frequency_analysis(BCLCS, freq_BCLCS, BCLCS_con, BCLCS_areaFieldName)
 arcpy.MakeFeatureLayer_management(BCLCS,"BCLCS_lyr")
 lyr_BCLCS = arcpy.mapping.Layer("BCLCS_lyr")
 
-''' Works
+
 ###OF39 VRI Class Unquieness - Using BCLCS Classes 1-4
 
 #First add the field to the copied Wetland Complex
@@ -927,7 +927,7 @@ arcpy.AddField_management(freq_BCLCS, ESI_Area, "DOUBLE")
 arcpy.CalculateField_management(freq_BCLCS, ESI_Area, ESI_FWAau_area, "PYTHON")
 
 
-calc = "!Shape_Area! / !ESI_Area!"
+calc = "!GEOMETRY_Area! / !ESI_Area!"
 arcpy.CalculateField_management(freq_BCLCS, BCLCS_PCNT, calc, "PYTHON")
 
 
@@ -1064,21 +1064,21 @@ lyr_wet_BCLCS_100m = arcpy.mapping.Layer("wetland_BCLCS_100m_lyr")
 #iterate through Wet Comp ID
 with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 	for test in cursor:
-		lyr_union_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
+		lyr_wet_BCLCS_100m.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
 			
 		#getcount of BCLCS type
-		result = arcpy.GetCount_management(lyr_union_BCLCS)
+		result = arcpy.GetCount_management(lyr_wet_BCLCS_100m)
 		num_classes = int(result.getOutput(0))
 		
 		test[1] = num_classes
 		cursor.updateRow(test)
 		
 
-lyr_union_BCLCS.definitionQuery = ""
+lyr_wet_BCLCS_100m.definitionQuery = ""
 
 #End OF41 
 
-'''
+
 
 ### OF42 - Number of BCLCS Class 4 fields w/i 2km
 
@@ -1118,7 +1118,7 @@ lyr_wet_BCLCS_2km.definitionQuery = ""
 
 # End OF42 #
 
-'''
+
 # OF 43 Amount of Decidious w/i 100m #
 
 #First add the field to the copied Wetland Complex
@@ -1287,4 +1287,4 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID,numClass_field]) as cursor:
 lyr_BCLCS.definitionQuery = r""
 
 # End OF45
-Works to here'''
+
