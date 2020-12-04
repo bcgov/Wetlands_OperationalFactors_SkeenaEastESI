@@ -1,6 +1,6 @@
 # Wetlands_OF_Assessment
 An ArcPY tool to access create Operational Factor (OF) Assessment Tool for the Skeena East ESI 
-Desktop Assessment of Wetlands (Tier 1.5)
+Desktop Assessment of Wetlands (Tier 1.5) pr WESP (Wetland Environmental Scoring Protocol, I can't remember what WESP stands for) tool to evaluate Wetland value for mitigation and like for like trading.
 
 Features
 Usage
