@@ -32,14 +32,14 @@ time = time.strftime("%y%m%d")
 
 #Input Wetland Complex dataset
 wetland_complex_input = arcpy.GetParameterAsText(0)
-#wetland_complex_input = r"V:\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T2\SSAF_Wetlands_T2_Data.gdb\SSAF_2020_WetlandComplex_Overlap_FFHpossibleWatershed_200630"
+
 #Save Location Folder
 output_save = arcpy.GetParameterAsText(1)
-#output_save = r"V:\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\Values\Wetlands\T1.5"
+
 
 #Wetland Complex Unique ID Field
 wet_ID = arcpy.GetParameterAsText(2)
-#wet_ID = r"Wetland_Complex_ID"
+
 
 #create geodatabase to work out of
 save_gdb = "Wet_OF_" + time
