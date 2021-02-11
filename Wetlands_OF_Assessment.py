@@ -1118,12 +1118,41 @@ lyr_wet_BCLCS_2km.definitionQuery = ""
 
 # End OF42 #
 
+numClass_field = "Wet_Area_100m"
+arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
+
+#Build a table entry that states the area of Wetland + 100m 
+#create a def queryable layer from the clip
+arcpy.MakeFeatureLayer_management(wetbuff_100m,"wetbuff_100m_lyr")
+lyr_wetbuff100m = arcpy.mapping.Layer("wetbuff_100m_lyr")
+
+#get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
+desc = arcpy.Describe(lyr_wetbuff100m)
+geomField = desc.shapeFieldName
+wetbuff100m_areaFieldName = str(geomField) + "_Area"
+
+#iterate through Wet Comp ID
+with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, numClass_field]) as cursor:
+	for test in cursor:
+		wetArea = 0
+		
+		lyr_wetbuff100m.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
+		
+		cursor2 = arcpy.SearchCursor(lyr_wetbuff100m) 
+		#calculate the total area of Decid w/i 100m
+		for test2 in cursor2:
+			wetArea = test2.getValue(wetbuff100m_areaFieldName) + wetArea
+		
+		test[1] = wetArea
+		cursor.updateRow(test)
 
 # OF 43 Amount of Decidious w/i 100m #
 
 #First add the field to the copied Wetland Complex
-numClass_field = "OF43_DecidiousArea_BCLCS_wi100m"
+numClass_field = "DecidiousArea_BCLCS_wi100m"
+numPCNT_field = "OF43_DecidiousPCNT_BCLCS_wi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
+arcpy.AddField_management(wet_comp, numPCNT_field, "DOUBLE")
 
 #Definition query on decidious (aka Broadleaf)
 lyr_BCLCS.definitionQuery = r"BCLCS_LEVEL_4 = 'TB'"
@@ -1136,6 +1165,10 @@ arcpy.Clip_analysis(wetbuff_100m, lyr_BCLCS, area_decid_wi100m)
 #create a def queryable layer from the clip
 arcpy.MakeFeatureLayer_management(area_decid_wi100m,"decid_BCLCS_lyr")
 lyr_decid_BCLCS = arcpy.mapping.Layer("decid_BCLCS_lyr")
+
+
+
+
 
 #get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
 desc = arcpy.Describe(lyr_decid_BCLCS)
@@ -1153,11 +1186,13 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, numClass_field]) as cursor:
 		#calculate the total area of Decid w/i 100m
 		for test2 in cursor2:
 			decid_area = test2.getValue(decid_BCLCS_areaFieldName) + decid_area
-		
+				
 		test[1] = decid_area
 		cursor.updateRow(test)
 
 lyr_BCLCS.definitionQuery = r""
+calc1 = r"!DecidiousArea_BCLCS_wi100m! / !Wet_Area_100m!"
+arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
 
 # End OF43 
 
@@ -1165,9 +1200,10 @@ lyr_BCLCS.definitionQuery = r""
 
 ### OF44 - Amount of Coniferious w/i 100m 
 #First add the field to the copied Wetland Complex
-numClass_field = "OF44_ConiferousArea_BCLCS_wi100m"
+numClass_field = "ConiferousArea_BCLCS_wi100m"
+numPCNT_field = "OF44_ConiferousPCNT_BCLCS_wi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
-
+arcpy.AddField_management(wet_comp, numPCNT_field, "DOUBLE")
 #Definition query on decidious (aka Broadleaf)
 lyr_BCLCS.definitionQuery = r"BCLCS_LEVEL_4 = 'TC'"
 #output clip
@@ -1203,6 +1239,8 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 		
 lyr_BCLCS.definitionQuery = r""
 
+calc1 = r"!ConiferousArea_BCLCS_wi100m! / !Wet_Area_100m!"
+arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
 ### End OF44 
 
 ### Not an OF, but Mixed Treed
