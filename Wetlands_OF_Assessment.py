@@ -1245,9 +1245,10 @@ arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
 
 ### Not an OF, but Mixed Treed
 #First add the field to the copied Wetland Complex
-numClass_field = "OFxx_MixedTreeArea_BCLCS_wi100m"
+numPCNT_field = "OFxx_MixedTreePCNT_BCLCS_wi100m"
+numClass_field = "MixedTreeArea_BCLCS_wi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
-
+arcpy.AddField_management(wet_comp, numPCNT_field, "DOUBLE")
 #Definition query on decidious (aka Broadleaf)
 lyr_BCLCS.definitionQuery = r"BCLCS_LEVEL_4 = 'TM'"
 #output clip
@@ -1278,7 +1279,13 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 		
 		test[1] = mixed_area
 		cursor.updateRow(test)
+		
+		
 lyr_BCLCS.definitionQuery = r""
+
+#Calculate the percent w/i 100m
+calc1 = r"!MixedTreeArea_BCLCS_wi100m! / !Wet_Area_100m!"
+arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
 
 
 ### End of Extra Info 
@@ -1287,8 +1294,10 @@ lyr_BCLCS.definitionQuery = r""
 # OF45 - Amount of NonTreed Veg w/i 100m
 
 #First add the field to the copied Wetland Complex
-numClass_field = "OF45_NonTreedVegArea_BCLCS_wi100m"
+numPCNT_field = "OF45_NonTreedVegPCNT_BCLCS_wi100m"
+numClass_field = "NonTreedVegArea_BCLCS_wi100m"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
+arcpy.AddField_management(wet_comp, numPCNT_field, "DOUBLE")
 
 #Definition query on decidious (aka Broadleaf)
 lyr_BCLCS.definitionQuery = r"BCLCS_LEVEL_1 = 'V' AND BCLCS_LEVEL_2 = 'N'"
@@ -1324,5 +1333,7 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID,numClass_field]) as cursor:
 
 lyr_BCLCS.definitionQuery = r""
 
+#Calculate the percent w/i 100m
+calc1 = r"!NonTreedVegArea_BCLCS_wi100m! / !Wet_Area_100m!"
+arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
 # End OF45
-
