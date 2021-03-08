@@ -889,7 +889,7 @@ lyr_wet.definitionQuery = ""
 #Output Land Class Feature
 BCLCS = output_gdb + r"\BCLCS_VRI_Dissolve_" + time
 
-BCLCS_Interest = "BCLCS_LEVEL_1", "BCLCS_LEVEL_2", "BCLCS_LEVEL_3", "BCLCS_LEVEL_4"
+BCLCS_Interest = "BCLCS_LEVEL_1", "BCLCS_LEVEL_2", "BCLCS_LEVEL_3", "BCLCS_LEVEL_4", "BCLCS_LEVEL_5"
 #dissolve VRI into landcover type codes
 arcpy.Dissolve_management(vri, BCLCS, BCLCS_Interest)
 
