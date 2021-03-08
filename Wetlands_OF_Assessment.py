@@ -64,29 +64,37 @@ vri = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\E
 
 #Output
 wetbuff_100m = output_gdb + r"\Wetland_Complex_100m_buff_" + time
-wetbuff_500m = output_gdb + r"\Wetland_Complex_500m_buff_" + time
-wetbuff_1km = output_gdb + r"\Wetland_Complex_1km_buff_" + time
+#wetbuff_500m = output_gdb + r"\Wetland_Complex_500m_buff_" + time
+#wetbuff_1km = output_gdb + r"\Wetland_Complex_1km_buff_" + time
 wetbuff_2km = output_gdb + r"\Wetland_Complex_2km_buff_" + time
-wetbuff_5km = output_gdb + r"\Wetland_Complex_5km_buff_" + time
-wetbuff_10km = output_gdb + r"\Wetland_Complex_10km_buff_" + time
+#wetbuff_5km = output_gdb + r"\Wetland_Complex_5km_buff_" + time
+#wetbuff_10km = output_gdb + r"\Wetland_Complex_10km_buff_" + time
 
 #Buffers
 arcpy.Buffer_analysis(lyr_wet, wetbuff_100m, "100 Meters")
-arcpy.Buffer_analysis(lyr_wet, wetbuff_500m, "500 Meters")
-arcpy.Buffer_analysis(lyr_wet, wetbuff_1km, "1000 Meters")
+#arcpy.Buffer_analysis(lyr_wet, wetbuff_500m, "500 Meters")
+#arcpy.Buffer_analysis(lyr_wet, wetbuff_1km, "1000 Meters")
 arcpy.Buffer_analysis(lyr_wet, wetbuff_2km, "2000 Meters")
-arcpy.Buffer_analysis(lyr_wet, wetbuff_5km, "5000 Meters")
-arcpy.Buffer_analysis(lyr_wet, wetbuff_10km, "10000 Meters")
+#arcpy.Buffer_analysis(lyr_wet, wetbuff_5km, "5000 Meters")
+#arcpy.Buffer_analysis(lyr_wet, wetbuff_10km, "10000 Meters")
 
 #centroid output
 wet_centroid = output_gdb + r"\Wetland_Complex_Centroid_" + time
 #Centroid of Wetland Complex
 arcpy.FeatureToPoint_management(lyr_wet, wet_centroid, "INSIDE")
 
+'''
+
 #Centroid w/Elev
 wet_centroid_elev = output_gdb + r"\Wetland_Complex_Centroid_elev_" + time
 #DEM
+
+'''
+
 ''' Hard code of DEM - Change if you want to the DEM'''
+
+'''
+
 DEM = r"\\spatialfiles.bcgov\work\srm\bcce\shared\data_library\DEM\BC_Elevation_Mosaic_20161125.gdb\BC_elevation_mosaic"
 #Centroid w/ Elevation
 ExtractValuesToPoints(wet_centroid, DEM, wet_centroid_elev)
@@ -105,9 +113,11 @@ arcpy.Buffer_analysis(wet_centroid, cent_buff_50m, "50 Meters")
 arcpy.Buffer_analysis(wet_centroid, cent_buff_100m, "100 Meters")
 arcpy.Buffer_analysis(wet_centroid, cent_buff_500m, "500 Meters")
 
+'''
+
 ''' End of Buffering '''
 
-
+'''
 ###OF1 - Process to Calculate Distance to Human Settlement###
 #Human Settlement Feature
 
@@ -871,8 +881,11 @@ lyr_wet.definitionQuery = ""
 ### End OF32 ###
 
 
-
+'''
 '''Hard Code for BCLCS Stuff'''
+
+
+
 #Output Land Class Feature
 BCLCS = output_gdb + r"\BCLCS_VRI_Dissolve_" + time
 
@@ -890,7 +903,7 @@ geomField = desc.shapeFieldName
 BCLCS_areaFieldName = str(geomField) + "_Area"
 
 #Calculate Concatonated field for BCLCS
-arcpy.CalculateField_management(BCLCS,BCLCS_con, r"!BCLCS_LEVEL_1! + ' ' +  !BCLCS_LEVEL_2! + ' ' + !BCLCS_LEVEL_3! + ' ' + !BCLCS_LEVEL_4!", "PYTHON")
+arcpy.CalculateField_management(BCLCS,BCLCS_con, r"!BCLCS_LEVEL_1! + ' ' +  !BCLCS_LEVEL_2! + ' ' + !BCLCS_LEVEL_3! + ' ' + !BCLCS_LEVEL_4! + ' ' + !BCLCS_LEVEL_5!", "PYTHON")
 
 #BCLCS Frequency Output
 freq_BCLCS = output_gdb + r"\BCLCS_Freq_" + time
@@ -902,6 +915,8 @@ arcpy.MakeFeatureLayer_management(BCLCS,"BCLCS_lyr")
 lyr_BCLCS = arcpy.mapping.Layer("BCLCS_lyr")
 
 
+
+'''
 ###OF39 VRI Class Unquieness - Using BCLCS Classes 1-4
 
 #First add the field to the copied Wetland Complex
@@ -1117,7 +1132,8 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 lyr_wet_BCLCS_2km.definitionQuery = ""
 
 # End OF42 #
-
+'''
+#Add Wetland Area 100m
 numClass_field = "Wet_Area_100m"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
 
@@ -1145,7 +1161,37 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, numClass_field]) as cursor:
 		
 		test[1] = wetArea
 		cursor.updateRow(test)
+		
+#Add Wetland Area 2km
+numClass_field = "Wet_Area_2km"
+arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
 
+#Build a table entry that states the area of Wetland + 2km 
+#create a def queryable layer from the clip
+arcpy.MakeFeatureLayer_management(wetbuff_2km,"wetbuff_2km_lyr")
+lyr_wetbuff2km = arcpy.mapping.Layer("wetbuff_2km_lyr")
+
+#get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
+desc = arcpy.Describe(lyr_wetbuff2km)
+geomField = desc.shapeFieldName
+wetbuff2km_areaFieldName = str(geomField) + "_Area"
+
+#iterate through Wet Comp ID
+with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, numClass_field]) as cursor:
+	for test in cursor:
+		wetArea = 0
+		
+		lyr_wetbuff2km.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
+		
+		cursor2 = arcpy.SearchCursor(lyr_wetbuff2km) 
+		#calculate the total area of Decid w/i 100m
+		for test2 in cursor2:
+			wetArea = test2.getValue(wetbuff2km_areaFieldName) + wetArea
+		
+		test[1] = wetArea
+		cursor.updateRow(test)
+
+'''
 # OF 43 Amount of Decidious w/i 100m #
 
 #First add the field to the copied Wetland Complex
@@ -1165,9 +1211,6 @@ arcpy.Clip_analysis(wetbuff_100m, lyr_BCLCS, area_decid_wi100m)
 #create a def queryable layer from the clip
 arcpy.MakeFeatureLayer_management(area_decid_wi100m,"decid_BCLCS_lyr")
 lyr_decid_BCLCS = arcpy.mapping.Layer("decid_BCLCS_lyr")
-
-
-
 
 
 #get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
@@ -1289,7 +1332,7 @@ arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
 
 
 ### End of Extra Info 
-
+'''
 
 # OF45 - Amount of NonTreed Veg w/i 100m
 
@@ -1337,3 +1380,46 @@ lyr_BCLCS.definitionQuery = r""
 calc1 = r"!NonTreedVegArea_BCLCS_wi100m! / !Wet_Area_100m!"
 arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
 # End OF45
+
+# OF46 - Surface Water w/i 2km
+
+#First add the field to the copied Wetland Complex
+numPCNT_field = "OF46_SurfaceWaterPCNT_BCLCS_wi2km"
+numClass_field = "SurfaceWaterArea_BCLCS_wi2km"
+arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
+arcpy.AddField_management(wet_comp, numPCNT_field, "DOUBLE")
+
+#Definition query on decidious (aka Broadleaf)
+lyr_BCLCS.definitionQuery = r"(BCLCS_LEVEL_1 = 'N' AND BCLCS_LEVEL_2 = 'W') OR (BCLCS_LEVEL_5 IN ('LA','RE'))"
+#output clip
+area_watersurface_wi2km = output_gdb + r"\SurfaceWater"
+
+#clip
+arcpy.Clip_analysis(wetbuff_2km, lyr_BCLCS, area_watersurface_wi2km)
+
+#create a def queryable layer from the clip
+arcpy.MakeFeatureLayer_management(area_watersurface_wi2km,"watersurface_BCLCS_lyr")
+lyr_watersurface_BCLCS = arcpy.mapping.Layer("watersurface_BCLCS_lyr")
+
+#get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
+desc = arcpy.Describe(lyr_watersurface_BCLCS)
+geomField = desc.shapeFieldName
+watersurface_BCLCS_areaFieldName = str(geomField) + "_Area"
+
+#iterate through Wet Comp ID
+with arcpy.da.UpdateCursor(wet_comp, [wet_ID,numClass_field]) as cursor:
+	for test in cursor:
+		water_area = 0
+		lyr_watersurface_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
+		
+		cursor2 = arcpy.SearchCursor(lyr_watersurface_BCLCS) 
+		#calculate the total area of Water Surface w/i 2km
+		for test2 in cursor2:
+			water_area = test2.getValue(watersurface_BCLCS_areaFieldName) + water_area
+		
+		test[1] = water_area
+		cursor.updateRow(test)
+		
+
+lyr_BCLCS.definitionQuery = r""
+# End OF46
