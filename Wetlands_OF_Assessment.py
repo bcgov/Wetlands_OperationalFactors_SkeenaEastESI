@@ -637,7 +637,7 @@ arcpy.AddField_management(wet_comp, karst_field, "TEXT")
 karst_join = output_gdb + r"\Wetland_Karst_" + time
 #Spatial Join
 arcpy.SpatialJoin_analysis(wet_comp, karst, karst_join, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
-#Get the wet_ID that overlap with the 10km Buffer
+#Get the wet_ID that overlap with the Karst
 overlap_karst = [row[0] for row in arcpy.da.SearchCursor(karst_join, wet_ID)]
 
 #building for the def query just right
@@ -668,11 +668,11 @@ faults = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Dat
 fault_field = "OF20_GeogFault"
 arcpy.AddField_management(wet_comp, fault_field, "TEXT")
 
-#Karst and Wetland spatial join Output
+#GeogFault and Wetland spatial join Output
 fault_join = output_gdb + r"\Wetland_GeogFault_" + time
 #Spatial Join
 arcpy.SpatialJoin_analysis(wet_comp, faults, fault_join, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
-#Get the wet_ID that overlap with the 10km Buffer
+#Get the wet_ID that overlap with the Geological Fault
 overlap_fault = [row[0] for row in arcpy.da.SearchCursor(fault_join, wet_ID)]
 
 #building for the def query just right
