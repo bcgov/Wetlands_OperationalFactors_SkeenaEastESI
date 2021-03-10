@@ -1423,7 +1423,7 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID,numClass_field]) as cursor:
 
 lyr_BCLCS.definitionQuery = r""
 
-#Calculate the percent w/i 100m
+#Calculate the percent w/i 2km
 calc1 = r"!SurfaceWaterArea_BCLCS_wi2km! / !Wet_Area_2km!"
 arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
 # End OF46
