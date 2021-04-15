@@ -61,7 +61,7 @@ vri = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\E
 '''Hardcode VRI - Change'''
 
 '''Buffer the Wetland Complexs to different needs'''
-
+'''
 #Output
 wetbuff_100m = output_gdb + r"\Wetland_Complex_100m_buff_" + time
 #wetbuff_500m = output_gdb + r"\Wetland_Complex_500m_buff_" + time
@@ -77,25 +77,27 @@ arcpy.Buffer_analysis(lyr_wet, wetbuff_100m, "100 Meters")
 arcpy.Buffer_analysis(lyr_wet, wetbuff_2km, "2000 Meters")
 #arcpy.Buffer_analysis(lyr_wet, wetbuff_5km, "5000 Meters")
 #arcpy.Buffer_analysis(lyr_wet, wetbuff_10km, "10000 Meters")
-
+'''
 #centroid output
 wet_centroid = output_gdb + r"\Wetland_Complex_Centroid_" + time
 #Centroid of Wetland Complex
 arcpy.FeatureToPoint_management(lyr_wet, wet_centroid, "INSIDE")
 
-'''
 
+'''
 #Centroid w/Elev
 wet_centroid_elev = output_gdb + r"\Wetland_Complex_Centroid_elev_" + time
 #DEM
 
 '''
 
-''' Hard code of DEM - Change if you want to the DEM'''
+
+
 
 '''
-
+# *** Hard code of DEM - Change if you want to the DEM
 DEM = r"\\spatialfiles.bcgov\work\srm\bcce\shared\data_library\DEM\BC_Elevation_Mosaic_20161125.gdb\BC_elevation_mosaic"
+
 #Centroid w/ Elevation
 ExtractValuesToPoints(wet_centroid, DEM, wet_centroid_elev)
 
@@ -771,9 +773,9 @@ calc_lakesPerc = r"(!Arealakes_wi2km!/!TotalArea_wi2km!)"
 arcpy.CalculateField_management(lyr_wet, percentLakes_field, calc_lakesPerc, "PYTHON")
 
 
-### End OF21 ###
-#Script has run to at least here
-### OF22 Percentage of Area wetland and lakes w/i 2km of Wetland###
+# *** End OF21 ***
+
+# *** OF22 Percentage of Area wetland and lakes w/i 2km of Wetland ***
 
 
 #First add the field to the copied Wetland Complex
@@ -834,19 +836,18 @@ lyr_wet.definitionQuery = ""
 calc_lakesPerc2 = r"(!AreaWetlakes_wi2km!/!TotalArea_wi2km!)"
 arcpy.CalculateField_management(lyr_wet, percentWater_field, calc_lakesPerc2, "PYTHON")
 
-### End OF22 ###
+# *** End OF22 ***
 
-
-### OF28 Species of Conservation Concer###
+# *** OF28 Species of Conservation Concer ***
 
 #yes/no for plants/communites inside 100m buffer
 #yes/no for waterbird inside 100m buffer
 #yes/no for other bird inside 100m buffer
 
-### End OF28 ###
+# *** End OF28 ***
 
 
-### OF32 Soil Nutrients based on Site Index ###
+# *** OF32 Soil Nutrients based on Site Index ***
 
 #First add the field to the copied Wetland Complex
 siteIndex_field = "OF32_SiteIndex"
@@ -872,19 +873,17 @@ with arcpy.da.UpdateCursor(site_Index, [wet_ID, "SITE_INDEX"]) as cursor:
 			cursor5.updateRow(test5)
 lyr_wet.definitionQuery = ""
 
-##3 End OF32 ###
+# *** End OF32 ***
 
-### OF33 Position in Landscape ###
+# *** OF33 Position in Landscape ***
 
 #Not sure how this differs from OF5 in terms of relative position?
 
-### End OF32 ###
+# *** End OF32 ***
 
 
-'''
-'''Hard Code for BCLCS Stuff'''
 
-
+# *** Hard Code for BCLCS Stuff ***
 
 #Output Land Class Feature
 BCLCS = output_gdb + r"\BCLCS_VRI_Dissolve_" + time
@@ -894,7 +893,7 @@ BCLCS_Interest = "BCLCS_LEVEL_1", "BCLCS_LEVEL_2", "BCLCS_LEVEL_3", "BCLCS_LEVEL
 arcpy.Dissolve_management(vri, BCLCS, BCLCS_Interest)
 
 #Add BCLCS Level 1 to 4 Concatonated field
-BCLCS_con = "BCLCS_Lev1to4"
+BCLCS_con = "BCLCS_Lev1to5"
 arcpy.AddField_management(BCLCS, BCLCS_con, "TEXT")
 
 #get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
@@ -916,8 +915,8 @@ lyr_BCLCS = arcpy.mapping.Layer("BCLCS_lyr")
 
 
 
-'''
-###OF39 VRI Class Unquieness - Using BCLCS Classes 1-4
+
+# *** OF39 VRI Class Unquieness - Using BCLCS Classes 1-4 ***
 
 #First add the field to the copied Wetland Complex
 uniqueClass_field = "OF39_UniqueClass_Dist"
@@ -1042,20 +1041,81 @@ arcpy.CalculateField_management (lyr_wet, uniqueClass_field, calc1000)
 lyr_wet.definitionQuery = ""
 lyr_BCLCS.definitionQuery = ""
 
-### End OF39
+# *** End OF39
 
 
 
-###OF40 - Maximum Dominance of BCLCS Class 4
-uniqueClass_field = "OF40_MaxDom_BCLCS"
-arcpy.AddField_management(wet_comp, uniqueClass_field, "DOUBLE")
+# *** OF40 - Maximum Dominance of BCLCS Class 4 ***
+maxClass_field = "OF40_MaxDom_BCLCS4"
+arcpy.AddField_management(wet_comp, maxClass_field, "TEXT")
 
-#Gotta think about more
+#Dissolve the BCLCS Feature Further
+BCLCS_lvl4 = "BCLCS_LEVEL_4"
+#Output
+Dis_BCLCS_lvl4 = output_gdb + r"\Dissolve_BCLCSlvl4_" + time
+#dissolve VRI into landcover type codes
+arcpy.Dissolve_management(vri, Dis_BCLCS_lvl4, BCLCS_lvl4)
 
-###End OF40
+#output of BCLCS Wetland Union
+BCLCS4_wet_union = output_gdb + r"\Wet_BCLCSLvl4"
+
+#Spatial Join
+arcpy.SpatialJoin_analysis(wet_comp, Dis_BCLCS_lvl4, BCLCS4_wet_union, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+
+#BCLCS Frequency Output
+freq_Level4_BCLCS = output_gdb + r"\BCLCS_4_Freq_" + time
+
+#Get a summary of each Level 4 amount using frequency field
+arcpy.Frequency_analysis(BCLCS4_wet_union, freq_Level4_BCLCS, [wet_ID, BCLCS_lvl4], "GEOMETRY_Area")
+
+# *** Not needed for a table
+#create a query layer for BCLCS Level 4 Freq
+#arcpy.MakeFeatureLayer_management(freq_Level4_BCLCS,"Level4_lyr")
+#lyr_Level4_BCLCS = arcpy.mapping.Layer("Level4_lyr")
 
 
-###OF41 - Number of BCLCS Class 4 fields w/i 100m 
+#create a query table for the freq table
+arcpy.MakeTableView_management(freq_Level4_BCLCS,"Level4_lyr")
+lyr_Level4_BCLCS = arcpy.mapping.TableView("Level4_lyr")
+
+#Get the max area for each wetland through a query of wet_ID in Freq Table, and Max tool
+#iterate through Wet Comp ID
+with arcpy.da.UpdateCursor(wet_comp, [wet_ID, maxClass_field]) as cursor:
+	for test in cursor:
+		#Query the frequency table based on each wetland
+		lyr_Level4_BCLCS.definitionQuery = wet_ID + ' = ' + str(test[0])[:-2]
+		
+		
+		#This stuff is wrong
+		#get largest BCLCS type
+		#BCLCS4_list = arcpy.da.SearchCursor(lyr_Level4_BCLCS, r"BCLCS_LEVEL_4", "{} IS NOT NULL".format(r"BCLCS_LEVEL_4"), sql_clause = (None, "ORDER BY {} DESC".format(r"GEOMETRY_Area"))).next()[0]
+		
+		#Trying to test simpler 
+		#max_row = [row_ for row_ in lyr_Level4_BCLCS[1]]
+		
+		#Create a list to find the max value for
+		BCLCS4_list = [row for row in arcpy.da.SearchCursor(lyr_Level4_BCLCS, ["BCLCS_LEVEL_4", "GEOMETRY_Area"])]
+		
+		#print the list to make sure it is properly populating
+		print BCLCS4_list
+		
+		#find the largest value row based on the column for area
+		max_value = max(BCLCS4_list, key=lambda x: x[1])
+		print max_value
+		#Take the Level 4 code for the row with the most area
+		max_final = max_value[0]
+		print max_final
+		
+		
+		
+		
+		test[1] = max_final
+		cursor.updateRow(test)
+		
+# *** End OF40 ***
+
+
+# *** OF41 - Number of BCLCS Class 4 fields w/i 100m ***
 
 #First add the field to the copied Wetland Complex
 numClass_field = "OF41_NumClasses_BCLCSwi100m"
@@ -1095,7 +1155,7 @@ lyr_wet_BCLCS_100m.definitionQuery = ""
 
 
 
-### OF42 - Number of BCLCS Class 4 fields w/i 2km
+# *** OF42 - Number of BCLCS Class 4 fields w/i 2km ***
 
 #First add the field to the copied Wetland Complex
 numClass_field = "OF42_NumClasses_BCLCSwi2km"
@@ -1106,7 +1166,7 @@ BCLCS_2km = output_gdb + r"\Wet2km_BCLCS_intersect" + time
 #union wetlands and BCLCS
 
 #Union causing issues... Repair Geometry of Both Doesn't seem to help.
-#arcpy.RepairGeometry_management(lyr_BCLCS)
+
 #arcpy.RepairGeometry_management(wetbuff_2km)
 
 #Spatial Join
@@ -1131,8 +1191,9 @@ with arcpy.da.UpdateCursor(wet_comp, [wet_ID, numClass_field]) as cursor:
 
 lyr_wet_BCLCS_2km.definitionQuery = ""
 
-# End OF42 #
-'''
+# *** End OF42 ***
+
+
 #Add Wetland Area 100m
 numClass_field = "Wet_Area_100m"
 arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
@@ -1191,8 +1252,8 @@ with arcpy.da.UpdateCursor(lyr_wet, [wet_ID, numClass_field]) as cursor:
 		test[1] = wetArea
 		cursor.updateRow(test)
 
-'''
-# OF 43 Amount of Decidious w/i 100m #
+
+# *** OF 43 Amount of Decidious w/i 100m ***
 
 #First add the field to the copied Wetland Complex
 numClass_field = "DecidiousArea_BCLCS_wi100m"
@@ -1241,7 +1302,8 @@ arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
 
 
 
-### OF44 - Amount of Coniferious w/i 100m 
+# *** OF44 - Amount of Coniferious w/i 100m ***
+
 #First add the field to the copied Wetland Complex
 numClass_field = "ConiferousArea_BCLCS_wi100m"
 numPCNT_field = "OF44_ConiferousPCNT_BCLCS_wi100m"
@@ -1284,9 +1346,9 @@ lyr_BCLCS.definitionQuery = r""
 
 calc1 = r"!ConiferousArea_BCLCS_wi100m! / !Wet_Area_100m!"
 arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
-### End OF44 
+# *** End OF44 ***
 
-### Not an OF, but Mixed Treed
+# *** Not an OF, but Mixed Treed
 #First add the field to the copied Wetland Complex
 numPCNT_field = "OFxx_MixedTreePCNT_BCLCS_wi100m"
 numClass_field = "MixedTreeArea_BCLCS_wi100m"
@@ -1331,8 +1393,8 @@ calc1 = r"!MixedTreeArea_BCLCS_wi100m! / !Wet_Area_100m!"
 arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
 
 
-### End of Extra Info 
-'''
+# *** End of Extra Info 
+
 
 # OF45 - Amount of NonTreed Veg w/i 100m
 
@@ -1379,9 +1441,9 @@ lyr_BCLCS.definitionQuery = r""
 #Calculate the percent w/i 100m
 calc1 = r"!NonTreedVegArea_BCLCS_wi100m! / !Wet_Area_100m!"
 arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
-# End OF45
+# *** End OF45 ***
 
-# OF46 - Surface Water w/i 2km
+# *** OF46 - Surface Water w/i 2km ***
 
 #First add the field to the copied Wetland Complex
 numPCNT_field = "OF46_SurfaceWaterPCNT_BCLCS_wi2km"
@@ -1427,3 +1489,125 @@ lyr_BCLCS.definitionQuery = r""
 calc1 = r"!SurfaceWaterArea_BCLCS_wi2km! / !Wet_Area_2km!"
 arcpy.CalculateField_management (lyr_wet, numPCNT_field, calc1, r"PYTHON")
 # End OF46
+
+'''
+
+# OF49 - Amount of Wetland in Watershed
+#First add the field to the copied Wetland Complex
+FWA_AU = "WATERSHED_FEATURE_ID"
+field1 = "Gross_WetArea"
+numClass_field = "OF49_PCNT_Density_Wet_inAU"
+FWA_Area = "FWA_AU_Area"
+arcpy.AddField_management(wet_comp, FWA_AU, "DOUBLE")
+arcpy.AddField_management(wet_comp, FWA_Area, "DOUBLE")
+arcpy.AddField_management(wet_comp, field1, "DOUBLE")
+arcpy.AddField_management(wet_comp, numClass_field, "DOUBLE")
+
+
+#Get Wetland Area
+#get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
+desc = arcpy.Describe(lyr_wet)
+geomField = desc.shapeFieldName
+wetland_areaFieldName = str(geomField) + "_Area"
+
+# **** Hard Code **** FWA AU Feature
+AU_Feat = r"\\spatialfiles.bcgov\work\srm\smt\Workarea\ArcProj\P17_Skeena_ESI\Data\ESI_Data.gdb\AU\SSAF_fwaAU_Watersheds"
+#Set Watershed aka AU ID **** Hard Code **** 
+au_ID = "WATERSHED_FEATURE_ID"
+
+#Get AU Area
+#get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
+desc = arcpy.Describe(AU_Feat)
+geomField = desc.shapeFieldName
+AU_areaFieldName = str(geomField) + "_Area"
+
+#Get a list of the AU_ID 
+au_ID_list = [row[0] for row in arcpy.da.SearchCursor(AU_Feat, au_ID)]
+
+#Output of Union
+output_Union_wetAU = output_gdb + r"\Union_AU_Wetlands_" + time
+
+#Union Wetlands and FWA AUs
+arcpy.Union_analysis([AU_Feat, wet_comp], output_Union_wetAU)
+
+#Create Lyr of Union for querying
+arcpy.MakeFeatureLayer_management(output_Union_wetAU,"AUwet_lyr")
+lyr_AUwet = arcpy.mapping.Layer("AUwet_lyr")
+
+#Get Union Area
+#get the areafield name to avoid geometry vs shape issue (Thanks you Carol Mahood)
+desc = arcpy.Describe(lyr_AUwet)
+geomField = desc.shapeFieldName
+AU_wetland_areaFieldName = str(geomField) + "_Area"
+
+#Create List
+au = []
+
+for i in au_ID_list:
+	
+	#set the total area of wetland for the AU to 0
+	wetland_area = 0
+	
+	#Query the AU for clipping
+	lyr_AUwet.definitionQuery = au_ID + " = " + str(i)[:-2] + r"AND FID_WetComp_OF_" + time + r" >0"
+	
+	#iterate through the union feature to get the amount of area
+	cursor2 = arcpy.SearchCursor(lyr_AUwet) 
+	#calculate the total area of Water Surface w/i 2km
+	for test2 in cursor2:
+		#get the area of the wetlands in the au
+		wetland_area = test2.getValue(AU_wetland_areaFieldName) + wetland_area
+		
+	#store in variable based on AU number and 
+	wet_list_input = [i, wetland_area]
+	
+	#Append feature to the long list of Wetland Area by AU ID
+	au.append(wet_list_input)
+
+
+#Need to Associate an AU ID with each Wetland Complex
+wet_centroid_AUid = output_gdb + r"\Centroid_AUid_" + time
+arcpy.SpatialJoin_analysis(wet_centroid, AU_Feat, wet_centroid_AUid, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+
+#Assign wet_centroid_AUid into Wetland Complex
+#Output of spatial join
+output_Join_CentwetAU = output_gdb + r"\Centroid_AU_Wetlands_" + time
+
+#Spatial Join
+arcpy.SpatialJoin_analysis(wet_centroid_AUid, lyr_wet, output_Join_CentwetAU, "JOIN_ONE_TO_MANY", "KEEP_COMMON")
+
+#Create Lyr of spat join for querying
+arcpy.MakeFeatureLayer_management(output_Join_CentwetAU,"spatJoin_lyr")
+lyr_spatjoin = arcpy.mapping.Layer("spatJoin_lyr")
+
+with arcpy.da.UpdateCursor(lyr_wet, [wet_ID,FWA_AU,FWA_Area]) as cursor:
+	for test in cursor:
+		
+		#put a definition query on the lyr_wet
+		lyr_wet.definitionQuery = wet_ID + " = " + str(test[0])[:-2]
+		lyr_spatjoin.definitionQuery = wet_ID + " = " + str(test[0])[:-2]
+		cursor2 = arcpy.SearchCursor(lyr_spatjoin) 
+		for test2 in cursor2:
+			feat1 = test2.getValue(au_ID)
+			feat2 = test2.getValue(AU_areaFieldName)
+			
+		test[1] = feat1
+		test[2] = feat2
+		cursor.updateRow(test)
+
+lyr_wet.definitionQuery = ""		
+#Input AU Wetland Area the list or tuple created in the first for statementinto Wetland Complex through
+for a in au:
+
+	#query wetland complex via Wetland Complex id
+	lyr_wet.definitionQuery = au_ID + r" = " + str(a[0])[:-2]
+	calcArea = a[1]
+	#assign Gross wetland area for each wetland inside the AU based on the list
+	arcpy.CalculateField_management (lyr_wet, field1, calcArea, r"PYTHON")
+	
+lyr_wet.definitionQuery = ""	
+
+#Calculate the net area of wetland by subtracting Gross area by the area of the Wetland
+calc1 = r"!" + field1 + r"! / !" + FWA_Area + r"! * 100"  
+arcpy.CalculateField_management (lyr_wet, numClass_field, calc1, r"PYTHON")
+
